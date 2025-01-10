@@ -5,6 +5,14 @@ import { prisma } from "@/libs/db";
 import { redis } from "@/libs/redis";
 
 export const auth = betterAuth({
+    trustedOrigins: [
+        'https://photos.splive.top',
+        'https://bw.splive.top',
+        'http://localhost:3011',
+        'http://localhost:3012',
+        'http://localhost:3000',
+    ],
+
     user: {
         additionalFields: {
             vipExpiredAt: {
