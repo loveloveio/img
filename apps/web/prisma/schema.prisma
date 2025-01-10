@@ -1,0 +1,417 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+enum PhotoCollectionStatus {
+  ENABLED
+  DISABLED
+}
+
+model PhotoCollection {
+  id            BigInt                @id @default(autoincrement())
+  uuid          String                @default(cuid())
+  title         String
+  subtitle      String?
+  description   String?
+  cover         String?               @default("")
+  tags          String[]              @default([])
+  // 预览图列表
+  previewImages String[]              @default([])
+  // 付费图列表  
+  paidImages    String[]              @default([])
+  // 排序
+  sort          Int                   @default(0)
+  // 状态
+  status        PhotoCollectionStatus @default(ENABLED)
+  // 推荐
+  recommend     Boolean               @default(false)
+  // 图片数量
+  imageCount    Int                   @default(0) @map("image_count")
+  // 创建时间
+  createdAt     DateTime              @default(now()) @map("created_at")
+  // 更新时间
+  updatedAt     DateTime              @updatedAt @map("updated_at")
+  // 删除时间
+  deletedAt     DateTime?             @map("deleted_at") @db.Timestamp(0)
+
+  viewHistories            ViewHistory[]
+  photoCollectionFavorites PhotoCollectionFavorite[]
+
+  @@index([uuid])
+  @@map("photo_collections")
+}
+
+enum VipPackageStatus {
+  ENABLED
+  DISABLED
+}
+
+model VipPackage {
+  id        BigInt           @id @default(autoincrement())
+  title     String
+  subtitle  String?
+  status    VipPackageStatus @default(ENABLED)
+  price     Decimal          @default(0) @map("price") @db.Decimal(10, 2)
+  duration  Int
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+  deletedAt DateTime?        @map("deleted_at")
+
+  orders Order[]
+
+  @@index([status])
+  @@map("vip_packages")
+}
+
+enum OrderStatus {
+  // 待支付
+  PENDING
+  // 已支付
+  PAID
+  // 已取消
+  CANCELLED
+}
+
+// 订单
+
+model Order {
+  id           BigInt      @id @default(autoincrement())
+  no           String      @map("no")
+  user         User        @relation(fields: [userId], references: [id])
+  userId       String
+  vipPackage   VipPackage  @relation(fields: [vipPackageId], references: [id])
+  vipPackageId BigInt
+  // 订单状态
+  status       OrderStatus @default(PENDING)
+  // 商户订单号
+  outTradeNo   String?     @map("out_trade_no")
+  // 支付时间
+  paidAt       DateTime?   @map("paid_at")
+  // 支付金额
+  paidAmount   Decimal     @default(0) @map("paid_amount") @db.Decimal(10, 2)
+
+  paymentMethod   PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+  paymentMethodId BigInt
+  // 创建时间 
+  createdAt       DateTime      @default(now()) @map("created_at")
+  // 更新时间
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  // 删除时间
+  deletedAt       DateTime?     @map("deleted_at")
+
+  @@index([userId])
+  @@index([vipPackageId])
+  @@index([outTradeNo])
+  @@index([paymentMethodId])
+  @@map("orders")
+}
+
+model ViewHistory {
+  id                BigInt          @id @default(autoincrement())
+  user              User            @relation(fields: [userId], references: [id])
+  userId            String
+  photoCollection   PhotoCollection @relation(fields: [photoCollectionId], references: [id])
+  photoCollectionId BigInt
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  deletedAt         DateTime        @map("deleted_at")
+
+  @@index([userId])
+  @@index([photoCollectionId])
+  @@map("view_histories")
+}
+
+enum PaymentMethodStatus {
+  ENABLED
+  DISABLED
+}
+
+model PaymentMethod {
+  id        BigInt              @id @default(autoincrement())
+  name      String
+  icon      String?
+  driver    String
+  status    PaymentMethodStatus @default(ENABLED)
+  config    Json
+  createdAt DateTime            @default(now()) @map("created_at")
+  updatedAt DateTime            @updatedAt @map("updated_at")
+  deletedAt DateTime?           @map("deleted_at")
+
+  orders Order[]
+
+  @@map("payment_methods")
+}
+
+model UploadFile {
+  id        String    @id @default(cuid())
+  // 文件名
+  filename  String
+  // 文件路径
+  path      String
+  // 文件大小(字节)
+  size      Int
+  // MIME类型
+  mimeType  String    @map("mime_type")
+  // 创建时间
+  createdAt DateTime  @default(now()) @map("created_at")
+  // 更新时间
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  // 删除时间
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("upload_files")
+}
+
+model User {
+  id                       String                    @id
+  name                     String
+  email                    String
+  emailVerified            Boolean
+  image                    String?
+  createdAt                DateTime
+  updatedAt                DateTime
+  role                     String?
+  banned                   Boolean?
+  banReason                String?
+  banExpires               DateTime?
+  username                 String?
+  vipExpiredAt             DateTime?
+  sessions                 Session[]
+  accounts                 Account[]
+  orders                   Order[]
+  viewHistories            ViewHistory[]
+  giftCards                GiftCard[]
+  browserHistories         BrowserHistory[]
+  photoCollectionFavorites PhotoCollectionFavorite[]
+
+  @@unique([email])
+  @@unique([username])
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime
+  token          String
+  createdAt      DateTime
+  updatedAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  impersonatedBy String?
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id])
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@index([userId])
+  @@index([providerId, accountId])
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+enum GiftCardPackageStatus {
+  ENABLED
+  DISABLED
+}
+
+model GiftCardPackage {
+  id        BigInt                @id @default(autoincrement())
+  cover     String?
+  title     String
+  subtitle  String?
+  status    GiftCardPackageStatus @default(ENABLED)
+  price     Decimal               @default(0) @map("price") @db.Decimal(10, 2)
+  duration  Int                   @default(0)
+  createdAt DateTime              @default(now()) @map("created_at")
+  updatedAt DateTime              @updatedAt @map("updated_at")
+  deletedAt DateTime?             @map("deleted_at")
+
+  giftCards GiftCard[]
+
+  @@map("gift_card_packages")
+}
+
+enum GiftCardStatus {
+  UNUSED
+  USED
+  EXPIRED
+}
+
+model GiftCard {
+  id                BigInt          @id @default(autoincrement())
+  code              String
+  giftCardPackage   GiftCardPackage @relation(fields: [giftCardPackageId], references: [id])
+  giftCardPackageId BigInt
+  status            GiftCardStatus  @default(UNUSED)
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  deletedAt         DateTime?       @map("deleted_at")
+  usedAt            DateTime?       @map("used_at")
+  userId            String?         @map("user_id")
+  user              User?           @relation(fields: [userId], references: [id])
+
+  @@index([code])
+  @@index([userId])
+  @@index([giftCardPackageId])
+  @@map("gift_cards")
+}
+
+enum SiteStatus {
+  ENABLED
+  DISABLED
+}
+
+model Site {
+  id          BigInt      @id @default(autoincrement())
+  icon        String?
+  description String?
+  name        String
+  url         String
+  // 点击数
+  clickCount  Int         @default(0) @map("click_count")
+  // 状态
+  status      SiteStatus  @default(ENABLED)
+  // 标签
+  tags        String[]    @default([])
+  // 排序
+  sort        Int         @default(0)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  deletedAt   DateTime?   @map("deleted_at")
+  clicks      SiteClick[]
+
+  @@map("sites")
+}
+
+model SiteClick {
+  id        BigInt   @id @default(autoincrement())
+  siteId    BigInt
+  site      Site     @relation(fields: [siteId], references: [id])
+  ipAddress String
+  userAgent String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([siteId])
+  @@map("site_clicks")
+}
+
+model BrowserHistory {
+  id        BigInt   @id @default(autoincrement())
+  userId    String?  @map("user_id")
+  user      User?    @relation(fields: [userId], references: [id])
+  url       String
+  ipAddress String
+  userAgent String
+  referrer  String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("browser_histories")
+}
+
+model ProxyNode {
+  id        BigInt          @id @default(autoincrement())
+  title     String
+  remark    String?
+  url       String
+  status    ProxyNodeStatus @default(ENABLED)
+  createdAt DateTime        @default(now()) @map("created_at")
+  updatedAt DateTime        @updatedAt @map("updated_at")
+  deletedAt DateTime?       @map("deleted_at")
+
+  @@map("proxy_nodes")
+}
+
+enum ProxyNodeStatus {
+  ENABLED
+  DISABLED
+}
+
+model Tag {
+  id           BigInt    @id @default(autoincrement())
+  title        String    @db.VarChar(255)
+  keywords     String?   @db.Text
+  sort         Int       @default(0)
+  allowDevices String[]  @default([]) @map("allow_devices")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  @@map("tags")
+}
+
+model ServiceEndpoint {
+  id        BigInt                @id @default(autoincrement())
+  name      String
+  url       String
+  remark    String?
+  status    ServiceEndpointStatus @default(ENABLED)
+  createdAt DateTime              @default(now()) @map("created_at")
+  updatedAt DateTime              @updatedAt @map("updated_at")
+  deletedAt DateTime?             @map("deleted_at")
+
+  @@map("service_endpoints")
+}
+
+enum ServiceEndpointStatus {
+  ENABLED
+  DISABLED
+}
+
+model PhotoCollectionFavorite {
+  id                BigInt          @id @default(autoincrement())
+  user              User            @relation(fields: [userId], references: [id])
+  userId            String
+  photoCollection   PhotoCollection @relation(fields: [photoCollectionId], references: [id])
+  photoCollectionId BigInt
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  deletedAt         DateTime?       @map("deleted_at")
+
+  @@index([userId])
+  @@index([photoCollectionId])
+  @@map("photo_collection_favorites")
+}
