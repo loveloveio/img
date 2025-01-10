@@ -40,21 +40,21 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       name: '订单管理',
       icon: <ShoppingOutlined />,
     },
-    {
-      path: '/admin/photo-collections',
-      name: '图集管理',
-      icon: <PictureOutlined />,
-    },
-    {
-      path: '/admin/payment-methods',
-      name: '支付方法管理',
-      icon: <PayCircleOutlined />,
-    },
-    {
-      path: '/admin/tags',
-      name: '标签管理',
-      icon: <TagsOutlined />,
-    },
+    // {
+    //   path: '/admin/photo-collections',
+    //   name: '图集管理',
+    //   icon: <PictureOutlined />,
+    // },
+    // {
+    //   path: '/admin/payment-methods',
+    //   name: '支付方法管理',
+    //   icon: <PayCircleOutlined />,
+    // },
+    // {
+    //   path: '/admin/tags',
+    //   name: '标签管理',
+    //   icon: <TagsOutlined />,
+    // },
     {
       path: '/admin/service-endpoints',
       name: '服务端点管理',

@@ -10,7 +10,7 @@ async function adminMiddleware(request: NextRequest) {
   const { data: session } = await betterFetch<Session>(
     "/api/auth/get-session",
     {
-      baseURL: 'http://localhost:3000',
+      baseURL: process.env.APP_URL,
       headers: {
         cookie: request.headers.get("cookie") || "",
       },
@@ -25,20 +25,18 @@ async function adminMiddleware(request: NextRequest) {
   }
 
   const user = session.user;
-  if (user?.role === 'admin') {
-    if (request.nextUrl.pathname.startsWith('/admin/sign-in')) {
-      return NextResponse.redirect(new URL("/admin/dashboard", request.url));
-    }
-    return NextResponse.next();
+  if (user?.role === 'admin' && request.nextUrl.pathname.startsWith('/admin/sign-in')) {
+    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
   }
-  return NextResponse.redirect(new URL("/member/mobile",request.url));
+  
+  return NextResponse.next();
 }
 
 async function memberMiddleware(request: NextRequest) {
   const { data: session } = await betterFetch<Session>(
     "/api/auth/get-session",
     {
-      baseURL: 'http://localhost:3000',
+      baseURL: process.env.APP_URL,
       headers: {
         cookie: request.headers.get("cookie") || "",
       },
