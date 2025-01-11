@@ -95,7 +95,14 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
       form={form}
       title={title}
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={(state) => {
+        onOpenChange(state);
+        if (!state) {
+          setPreviewImageFiles([]);
+          setPaidImageFiles([]);
+          form.resetFields();
+        }
+      }}
       initialValues={{
         ...initialValues,
         status: initialValues?.status || PaymentMethodStatus.ENABLED,
