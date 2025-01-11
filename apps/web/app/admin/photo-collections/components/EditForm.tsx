@@ -8,7 +8,7 @@ import { PaymentMethodStatus } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { useRef } from 'react';
 import asyncPool from './asyncPool';
-import upload from './request';
+import upload, { RequestTask } from './request';
 type Props = {
   initialValues?: any;
   onSuccess: () => void;

@@ -1,6 +1,11 @@
 import type { UploadProps } from "antd";
 import { RcFile } from "antd/es/upload";
 
+export interface RequestTask {
+    xhr: XMLHttpRequest;
+    data: File;
+    done?: () => void;
+  }
 type UploadRequestOption = Parameters<
   NonNullable<UploadProps["customRequest"]>
 >[0];
