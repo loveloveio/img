@@ -13,7 +13,7 @@ module.exports = {
       name: 'web',
       cwd: './apps/web',
       script: 'yarn',
-      args: 'start --port 3011',
+      args: 'start --port 3000',
       env: {
         NODE_ENV: 'development'
       }
