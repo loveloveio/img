@@ -1,8 +1,9 @@
 'use client';
 
-import { ModalForm, ProFormDigit, ProFormSelect } from '@ant-design/pro-components';
+import { ModalForm, ProFormDigit, ProFormInstance, ProFormSelect } from '@ant-design/pro-components';
 import { message } from 'antd';
 import axios from 'axios';
+import { useRef } from 'react';
 
 type Props = {
   onSuccess: () => void;
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export default function EditForm({ onSuccess, open, onOpenChange, title }: Props) {
+  const formRef = useRef<ProFormInstance>();
   const handleSubmit = async (values: any) => {
     try {
       console.log(values);
@@ -31,7 +33,13 @@ export default function EditForm({ onSuccess, open, onOpenChange, title }: Props
     <ModalForm
       title={title}
       open={open}
-      onOpenChange={onOpenChange}
+      formRef={formRef}
+      onOpenChange={(state) => {
+        onOpenChange(state);
+        if (!state) {
+          formRef.current?.resetFields();
+        }
+      }}
       onFinish={handleSubmit}
       modalProps={{
         destroyOnClose: true,

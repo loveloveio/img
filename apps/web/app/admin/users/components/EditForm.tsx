@@ -1,9 +1,9 @@
 'use client';
 
-import { ModalForm, ProFormText, ProFormTextArea, ProFormRadio, ProFormDateTimePicker, ProForm } from '@ant-design/pro-components';
+import { ModalForm, ProFormText, ProFormTextArea, ProFormRadio, ProFormDateTimePicker, ProForm, ProFormInstance } from '@ant-design/pro-components';
 import { message } from 'antd';
 import axios from 'axios';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 type Props = {
   initialValues?: any;
@@ -14,6 +14,7 @@ type Props = {
 };
 
 export default function EditForm({ initialValues, onSuccess, open, onOpenChange, title }: Props) {
+  const formRef = useRef<ProFormInstance>();
   const handleSubmit = async (values: any) => {
     try {
       if (initialValues) {
@@ -50,7 +51,13 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
     <ModalForm
       title={title}
       open={open}
-      onOpenChange={onOpenChange}
+      formRef={formRef}
+      onOpenChange={(state) => {
+        onOpenChange(state);
+        if (!state) {
+          formRef.current?.resetFields();
+        }
+      }}
       initialValues={{
         ...initialValues,
         banned: initialValues?.banned || false,

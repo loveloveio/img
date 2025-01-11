@@ -3,7 +3,7 @@
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, Popconfirm } from 'antd';
 import { useRef, useState } from 'react';
-import EditForm from './EditForm';
+import EditForm, { PhotoCollectionImage } from './EditForm';
 import axios from 'axios';
 
 import { PhotoCollection } from '@prisma/client';
@@ -90,24 +90,42 @@ export const List = () => {
           key="edit"
           type="link"
           onClick={() => {
+            const imageFiles: PhotoCollectionImage[] = [];
+            imageFiles.push({
+              uid: window.crypto.randomUUID(),
+              name: record.cover ?? '',
+              url: record.cover ?? '',
+              thumbUrl: record.cover ?? '',
+              status: 'done',
+              isCover: true,
+              isPaid: false,
+            });
+            record.previewImages.forEach((url) => {
+              imageFiles.push({
+                uid: window.crypto.randomUUID(),
+                name: url,
+                url: url,
+                thumbUrl: url,
+                status: 'done',
+                isCover: false,
+                isPaid: false,
+              });
+            });
+            record.paidImages.forEach((url) => {
+              imageFiles.push({
+                uid: window.crypto.randomUUID(),
+                name: url,
+                url: url,
+                thumbUrl: url,
+                status: 'done',
+                isCover: false,
+                isPaid: true,
+              });
+            });
             setCurrentRecord({
               ...record,
               tags: record?.tags ?? [],
-              cover: [{
-                uid: window.crypto.randomUUID(),
-                name: record.cover,
-                url: record.cover,
-              }],
-              previewImages: record.previewImages.map((url) => ({
-                uid: window.crypto.randomUUID(),
-                name: url,
-                url: url,
-              })),
-              paidImages: record.paidImages.map((url) => ({
-                uid: window.crypto.randomUUID(),
-                name: url,
-                url: url,
-              }))
+              imageFiles,
             });
             setEditModalVisible(true);
           }}
@@ -195,14 +213,15 @@ export const List = () => {
         title={currentRecord ? '编辑图集' : '新增图集'}
         open={editModalVisible}
         onOpenChange={(state) => {
-          setEditModalVisible(state);
           if(!state){
             setCurrentRecord(null);
           }
+          setEditModalVisible(state);
         }}
         initialValues={currentRecord}
         onSuccess={() => {
           setEditModalVisible(false);
+          setCurrentRecord(null);
           actionRef.current?.reload();
         }}
       />

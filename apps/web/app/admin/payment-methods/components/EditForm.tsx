@@ -1,11 +1,12 @@
 'use client';
 
-import { ModalForm, ProFormText, ProFormRadio, ProFormUploadButton, ProFormTextArea } from '@ant-design/pro-components';
+import { ModalForm, ProFormText, ProFormRadio, ProFormUploadButton, ProFormTextArea, ProFormInstance } from '@ant-design/pro-components';
 import { useRouter } from 'next/navigation';
 
 import { PaymentMethodStatus } from '@prisma/client';
 import {toast} from 'react-hot-toast';
 import axios from 'axios';
+import { useRef } from 'react';
 
 type Props = {
   initialValues?: any;
@@ -16,7 +17,7 @@ type Props = {
 };
 
 export default function EditForm({ initialValues, onSuccess, open, onOpenChange, title }: Props) {
-
+  const formRef = useRef<ProFormInstance>();
   const handleSubmit = async (values: any) => {
     try {
       console.log('values',values);
@@ -41,7 +42,13 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
     <ModalForm
       title={title}
       open={open}
-      onOpenChange={onOpenChange}
+      formRef={formRef}
+      onOpenChange={(state) => {
+        onOpenChange(state);
+        if (!state) {
+          formRef.current?.resetFields();
+        }
+      }}
       initialValues={{
         ...initialValues,
         status: initialValues?.status || PaymentMethodStatus.ENABLED,
