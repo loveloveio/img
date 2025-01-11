@@ -154,7 +154,12 @@ export const List = () => {
       <EditForm
         title={currentRecord ? '编辑VIP套餐' : '新增VIP套餐'}
         open={editModalVisible}
-        onOpenChange={setEditModalVisible}
+        onOpenChange={(state) => {
+          setEditModalVisible(state);
+          if(!state){
+            setCurrentRecord(null);
+          }
+        }}
         initialValues={currentRecord}
         onSuccess={() => {
           setEditModalVisible(false);

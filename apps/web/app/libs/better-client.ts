@@ -1,6 +1,7 @@
 import { createAuthClient, z } from "better-auth/react"
 import { adminClient, inferAdditionalFields, usernameClient } from "better-auth/client/plugins"
 export const authClient =  createAuthClient({
+    baseURL: 'http://localhost:3000',
     plugins: [
         adminClient(),
         usernameClient(),
@@ -8,7 +9,7 @@ export const authClient =  createAuthClient({
             user: {
                 vipExpiredAt: {
                     type: 'date',
-                    input: false,
+                    input: false
                 }
             }
         })

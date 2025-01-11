@@ -194,7 +194,12 @@ export const List = () => {
       <EditForm
         title={currentRecord ? '编辑图集' : '新增图集'}
         open={editModalVisible}
-        onOpenChange={setEditModalVisible}
+        onOpenChange={(state) => {
+          setEditModalVisible(state);
+          if(!state){
+            setCurrentRecord(null);
+          }
+        }}
         initialValues={currentRecord}
         onSuccess={() => {
           setEditModalVisible(false);

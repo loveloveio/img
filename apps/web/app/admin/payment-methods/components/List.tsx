@@ -117,7 +117,12 @@ export default function List() {
       <EditForm
         title={currentRecord ? '编辑支付方法' : '新增支付方法'}
         open={editModalVisible}
-        onOpenChange={setEditModalVisible}
+        onOpenChange={(state) => {
+          setEditModalVisible(state);
+          if(!state){
+            setCurrentRecord(null);
+          }
+        }}
         initialValues={currentRecord}
         onSuccess={() => {
           setEditModalVisible(false);

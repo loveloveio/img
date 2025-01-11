@@ -151,7 +151,12 @@ export const List = () => {
       <EditForm
         title={currentRecord ? '编辑标签' : '新增标签'}
         open={editModalVisible}
-        onOpenChange={setEditModalVisible}
+        onOpenChange={(state) => {
+          setEditModalVisible(state);
+          if(!state){
+            setCurrentRecord(null);
+          }
+        }}
         initialValues={currentRecord}
         onSuccess={() => {
           setEditModalVisible(false);
