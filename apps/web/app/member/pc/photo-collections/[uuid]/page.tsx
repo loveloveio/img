@@ -136,7 +136,7 @@ export default function PhotoCollectionDetailPage() {
                         if (login) {
                             router.push('/member/pc/top-up')
                         } else {
-                            router.push('/member/pc/login')
+                            router.push('/member/pc/sign-in')
                         }
                     }} className="bg-yellow-500 text-white px-6 py-2 rounded-lg hover:bg-yellow-600">
                         立即开通会员，解锁VIP专享图片

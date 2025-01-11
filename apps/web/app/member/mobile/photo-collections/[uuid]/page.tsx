@@ -134,7 +134,7 @@ export default function PhotoCollectionDetailPage() {
                                 if (login) {
                                     router.push('/member/mobile/top-up')
                                 } else {
-                                    router.push('/member/mobile/login')
+                                    router.push('/member/mobile/sign-in')
                                 }
                             }}
                         >
