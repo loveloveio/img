@@ -5,10 +5,46 @@ import { Form, message } from 'antd';
 import axios from 'axios';
 
 import { PaymentMethodStatus } from '@prisma/client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRef } from 'react';
-import asyncPool from './asyncPool';
-import upload, { RequestTask } from './request';
+import type { UploadFile } from 'antd';
+class RequestQueue {
+  concurrency: number;
+  queue: any[];
+  processing: number;
+  constructor(concurrency = 5) {
+    this.concurrency = concurrency;
+    this.queue = [];
+    this.processing = 0;
+  }
+  // 查询对列数量
+  getQueueLength() {
+    return this.queue.length;
+  }
+  add(request: any) {
+    return new Promise((resolve, reject) => {
+      this.queue.push({ request, resolve, reject });
+      this.processQueue();
+    });
+  }
+
+  async processQueue() {
+    if (this.processing >= this.concurrency || this.queue.length === 0) {
+      return;
+    }
+    this.processing++;
+    const { request, resolve, reject } = this.queue.shift();
+    try {
+      const response = await request();
+      resolve(response);
+    } catch (error) {
+      reject(error);
+    } finally {
+      this.processing--;
+      this.processQueue();
+    }
+  }
+}
 type Props = {
   initialValues?: any;
   onSuccess: () => void;
@@ -18,54 +54,14 @@ type Props = {
 };
 export default function EditForm({ initialValues, onSuccess, open, onOpenChange, title }: Props) {
   const [form] = Form.useForm();
-  const previewImageUploadingRef = useRef(false);
-  const paidImageUploadingRef = useRef(false);
-  const coverUploadingRef = useRef(false);
-  const [previewImagesCount, setPreviewImagesCount] = useState(0);
-  const [paidImagesCount, setPaidImagesCount] = useState(0);
-  const [previewRequestTasks, setPreviewRequestTasks] = useState<RequestTask[]>([]);
-  const [paidRequestTasks, setPaidRequestTasks] = useState<RequestTask[]>([]);
-  const appendPreviewTask = (task: RequestTask) => setPreviewRequestTasks((pre) => [...pre, task]);
-  const appendPaidTask = (task: RequestTask) => setPaidRequestTasks((pre) => [...pre, task]);
+  const [previewImageFiles, setPreviewImageFiles] = useState<UploadFile[]>([]);
+  const [paidImageFiles, setPaidImageFiles] = useState<UploadFile[]>([]);
 
-  useEffect(() => {
-    if (previewImagesCount === previewRequestTasks.length) {
-      asyncPool(
-        2,
-        previewRequestTasks,
-        (item) =>
-          new Promise<void>((resolve) => {
-            const xhr = item.xhr;
-
-            item.done = resolve;
-
-            xhr.send(item.data);
-          }),
-      );
-    }
-  }, [previewImagesCount, previewRequestTasks]);
-
-  useEffect(() => {
-    if (paidImagesCount === paidRequestTasks.length) {
-      asyncPool(
-        2,
-        paidRequestTasks,
-        (item) =>
-          new Promise<void>((resolve) => {
-            const xhr = item.xhr;
-
-            item.done = resolve;
-
-            xhr.send(item.data);
-          }),
-      );
-    }
-  }, [paidImagesCount, paidRequestTasks]);
-
+  const currentRequestQueue = useRef<RequestQueue>(new RequestQueue(2));
   const handleSubmit = async (values: any) => {
     try {
       // 检查图片是否上传完成
-      if (!previewImageUploadingRef.current || !paidImageUploadingRef.current || !coverUploadingRef.current) {
+      if (currentRequestQueue.current.getQueueLength() > 0) {
         message.error('请等待图片上传完成');
         return false;
       }
@@ -94,7 +90,6 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
       return false;
     }
   };
-
   return (
     <ModalForm
       form={form}
@@ -145,12 +140,6 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
           name: 'file',
           listType: 'picture-card',
         }}
-        onChange={({fileList }) => {
-          if (!coverUploadingRef.current) {
-            const uploading = fileList.every((item) => item.status === 'done');
-            coverUploadingRef.current = uploading;
-          }
-        }}
         transform={(value) => {
           if (value && value[0]) {
             return value[0]?.response?.url || value[0]?.url;
@@ -164,19 +153,41 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
         label="预览图列表"
         max={200}
         action="/api/admin/upload"
-
+        fileList={previewImageFiles}
         fieldProps={{
           name: 'file',
           listType: 'picture-card',
           multiple: true,
-          customRequest: (option) => upload(option, appendPreviewTask),
-        }}
-        onChange={({fileList }) => {
-          if (!previewImageUploadingRef.current) {
-            const uploading = fileList.every((item) => item.status === 'done');
-            previewImageUploadingRef.current = uploading;
+          beforeUpload: (file) => {
+            const t: UploadFile = {
+              uid: file.uid,
+              name: file.name,
+              thumbUrl: '',
+              status: 'uploading',
+              originFileObj: file,
+            }
+            setPreviewImageFiles((pre) => [...pre, t]);
+            currentRequestQueue.current.add(() => {
+              const formData = new FormData();
+              formData.append('file', file);
+              return axios.post('/api/admin/upload', formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+              })
+            }).then((response: any) => {
+              setPreviewImageFiles((pre) => pre.map((item) => item.uid === file.uid ? { ...item, status: 'done', url: response.data.url, thumbUrl: response.data.url } : item));
+            })
+            .catch(error => {
+              console.error('文件上传失败:', error);
+              setPreviewImageFiles((pre) => pre.map((item) => item.uid === file.uid ? { ...item, status: 'error' } : item));
+            });;
+            return false;
+          },
+          onRemove: (file) => {
+            if (file.status === 'uploading') return false;
+            setPreviewImageFiles((pre) => pre.filter((item) => item.uid !== file.uid));
           }
-          setPreviewImagesCount(fileList.length);
         }}
         transform={(value) => {
           if (!value) return [];
@@ -191,18 +202,40 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
         label="付费图列表"
         max={200}
         action="/api/admin/upload"
+        fileList={paidImageFiles}
         fieldProps={{
           name: 'file',
           listType: 'picture-card',
           multiple: true,
-          customRequest: (option) => upload(option, appendPaidTask),
-        }}
-        onChange={({fileList }) => {
-          if (!paidImageUploadingRef.current) {
-            const uploading = fileList.every((item) => item.status === 'done');
-            paidImageUploadingRef.current = uploading;
+          beforeUpload: (file) => {
+            const t: UploadFile = {
+              uid: file.uid,
+              name: file.name,
+              thumbUrl: '',
+              status: 'uploading',
+              originFileObj: file,
+            }
+            currentRequestQueue.current.add(() => {
+              const formData = new FormData();
+              formData.append('file', file);
+              return axios.post('/api/admin/upload', formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+              })
+            }).then((response: any) => {
+              setPaidImageFiles((pre) => pre.map((item) => item.uid === file.uid ? { ...item, status: 'done', url: response.data.url, thumbUrl: response.data.url } : item));
+            })
+            .catch(error => {
+              console.error('文件上传失败:', error);
+              setPaidImageFiles((pre) => pre.map((item) => item.uid === file.uid ? { ...item, status: 'error' } : item));
+            });
+            return false;
+          },
+          onRemove: (file) => {
+            if (file.status === 'uploading') return false;
+            setPaidImageFiles((pre) => pre.filter((item) => item.uid !== file.uid));
           }
-          setPaidImagesCount(fileList.length);
         }}
         transform={(value) => {
           if (!value) return [];
