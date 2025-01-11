@@ -192,7 +192,7 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
         transform={(value) => {
           if (!value) return [];
           return {
-            previewImages: value.map((item: any) => (item?.response?.url || item?.url))
+            previewImages: previewImageFiles.map((item: any) => (item?.url ?? null)).filter((item: any) => item !== null)
           }
         }}
         rules={[{ required: true, message: '请上传预览图片' }]}
@@ -215,6 +215,7 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
               status: 'uploading',
               originFileObj: file,
             }
+            setPaidImageFiles((pre) => [...pre, t]);
             currentRequestQueue.current.add(() => {
               const formData = new FormData();
               formData.append('file', file);
@@ -238,9 +239,10 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
           }
         }}
         transform={(value) => {
+          console.log('@@@@@@@@@value', paidImageFiles);
           if (!value) return [];
           return {
-            paidImages: value.map((item: any) => (item?.response?.url || item?.url))
+            paidImages: paidImageFiles.map((item: any) => (item?.url ?? null)).filter((item: any) => item !== null)
           }
         }}
         rules={[{ required: true, message: '请上传付费图片' }]}
