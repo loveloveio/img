@@ -33,14 +33,29 @@ function generateFolderPath(levels = 2) {
 
 export const POST = async (req: NextRequest) => {
   try {
-    const formData = await req.formData();
-    const file = formData.get('file') as File;
+    const contentType = req.headers.get('content-type');
+    let file: File;
+    if (contentType?.includes('multipart/form-data')) {
+      const formData = await req.formData();
+      file = formData.get('file') as File;
 
-    if (!file) {
-      return NextResponse.json(
-        { error: 'File is required' },
-        { status: 400 }
-      );
+      if (!file) {
+        return NextResponse.json(
+          { error: 'File is required' },
+          { status: 400 }
+        );
+      }
+    } else {
+      const blob = await req.blob();
+      if (!blob) {
+        return NextResponse.json(
+          { error: 'File stream is required' },
+          { status: 400 }
+        );
+      }
+      // 文件名
+      const fileName: string | null = req.nextUrl.searchParams.get('name');
+      file = new File([blob], fileName ?? 'file', { type: blob.type });
     }
 
     // Validate file size

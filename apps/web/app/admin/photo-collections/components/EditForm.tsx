@@ -5,8 +5,10 @@ import { Form, message } from 'antd';
 import axios from 'axios';
 
 import { PaymentMethodStatus } from '@prisma/client';
+import { useEffect, useState } from 'react';
 import { useRef } from 'react';
-
+import asyncPool from './asyncPool';
+import upload from './request';
 type Props = {
   initialValues?: any;
   onSuccess: () => void;
@@ -19,6 +21,47 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
   const previewImageUploadingRef = useRef(false);
   const paidImageUploadingRef = useRef(false);
   const coverUploadingRef = useRef(false);
+  const [previewImagesCount, setPreviewImagesCount] = useState(0);
+  const [paidImagesCount, setPaidImagesCount] = useState(0);
+  const [previewRequestTasks, setPreviewRequestTasks] = useState<RequestTask[]>([]);
+  const [paidRequestTasks, setPaidRequestTasks] = useState<RequestTask[]>([]);
+  const appendPreviewTask = (task: RequestTask) => setPreviewRequestTasks((pre) => [...pre, task]);
+  const appendPaidTask = (task: RequestTask) => setPaidRequestTasks((pre) => [...pre, task]);
+
+  useEffect(() => {
+    if (previewImagesCount === previewRequestTasks.length) {
+      asyncPool(
+        2,
+        previewRequestTasks,
+        (item) =>
+          new Promise<void>((resolve) => {
+            const xhr = item.xhr;
+
+            item.done = resolve;
+
+            xhr.send(item.data);
+          }),
+      );
+    }
+  }, [previewImagesCount, previewRequestTasks]);
+
+  useEffect(() => {
+    if (paidImagesCount === paidRequestTasks.length) {
+      asyncPool(
+        2,
+        paidRequestTasks,
+        (item) =>
+          new Promise<void>((resolve) => {
+            const xhr = item.xhr;
+
+            item.done = resolve;
+
+            xhr.send(item.data);
+          }),
+      );
+    }
+  }, [paidImagesCount, paidRequestTasks]);
+
   const handleSubmit = async (values: any) => {
     try {
       // 检查图片是否上传完成
@@ -102,7 +145,7 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
           name: 'file',
           listType: 'picture-card',
         }}
-        onChange={({ fileList }) => {
+        onChange={({fileList }) => {
           if (!coverUploadingRef.current) {
             const uploading = fileList.every((item) => item.status === 'done');
             coverUploadingRef.current = uploading;
@@ -119,18 +162,21 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
       <ProFormUploadButton
         name="previewImages"
         label="预览图列表"
-        max={100}
+        max={200}
         action="/api/admin/upload"
+
         fieldProps={{
           name: 'file',
           listType: 'picture-card',
-          multiple: true
+          multiple: true,
+          customRequest: (option) => upload(option, appendPreviewTask),
         }}
-        onChange={({ fileList }) => {
+        onChange={({fileList }) => {
           if (!previewImageUploadingRef.current) {
             const uploading = fileList.every((item) => item.status === 'done');
             previewImageUploadingRef.current = uploading;
           }
+          setPreviewImagesCount(fileList.length);
         }}
         transform={(value) => {
           if (!value) return [];
@@ -143,18 +189,20 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
       <ProFormUploadButton
         name="paidImages"
         label="付费图列表"
-        max={100}
+        max={200}
         action="/api/admin/upload"
         fieldProps={{
           name: 'file',
           listType: 'picture-card',
           multiple: true,
+          customRequest: (option) => upload(option, appendPaidTask),
         }}
-        onChange={({ fileList }) => {
+        onChange={({fileList }) => {
           if (!paidImageUploadingRef.current) {
             const uploading = fileList.every((item) => item.status === 'done');
             paidImageUploadingRef.current = uploading;
           }
+          setPaidImagesCount(fileList.length);
         }}
         transform={(value) => {
           if (!value) return [];
