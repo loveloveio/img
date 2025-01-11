@@ -88,7 +88,7 @@ export default function Page() {
                             { min: 6, message: '密码至少6个字符' },
                             { max: 32, message: '密码最长32个字符' },
                             {
-                                pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,32}$/,
+                                pattern: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,32}$/,
                                 message: '密码必须包含字母和数字'
                             }
                         ]}
