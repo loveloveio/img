@@ -5,6 +5,7 @@ import { Form, message } from 'antd';
 import axios from 'axios';
 
 import { PaymentMethodStatus } from '@prisma/client';
+import { useRef } from 'react';
 
 type Props = {
   initialValues?: any;
@@ -14,8 +15,18 @@ type Props = {
   title: string;
 };
 export default function EditForm({ initialValues, onSuccess, open, onOpenChange, title }: Props) {
+  const [form] = Form.useForm();
+  const previewImageUploadingRef = useRef(false);
+  const paidImageUploadingRef = useRef(false);
+  const coverUploadingRef = useRef(false);
   const handleSubmit = async (values: any) => {
     try {
+      // 检查图片是否上传完成
+      if (!previewImageUploadingRef.current || !paidImageUploadingRef.current || !coverUploadingRef.current) {
+        message.error('请等待图片上传完成');
+        return false;
+      }
+
       if (initialValues) {
         // Update existing
         const response = await axios.put(`/api/admin/photo-collections/${initialValues.id}`, values);
@@ -43,6 +54,7 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
 
   return (
     <ModalForm
+      form={form}
       title={title}
       open={open}
       onOpenChange={onOpenChange}
@@ -90,6 +102,12 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
           name: 'file',
           listType: 'picture-card',
         }}
+        onChange={({ fileList }) => {
+          if (!coverUploadingRef.current) {
+            const uploading = fileList.every((item) => item.status === 'done');
+            coverUploadingRef.current = uploading;
+          }
+        }}
         transform={(value) => {
           if (value && value[0]) {
             return value[0]?.response?.url || value[0]?.url;
@@ -108,6 +126,12 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
           listType: 'picture-card',
           multiple: true
         }}
+        onChange={({ fileList }) => {
+          if (!previewImageUploadingRef.current) {
+            const uploading = fileList.every((item) => item.status === 'done');
+            previewImageUploadingRef.current = uploading;
+          }
+        }}
         transform={(value) => {
           if (!value) return [];
           return {
@@ -125,6 +149,12 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
           name: 'file',
           listType: 'picture-card',
           multiple: true,
+        }}
+        onChange={({ fileList }) => {
+          if (!paidImageUploadingRef.current) {
+            const uploading = fileList.every((item) => item.status === 'done');
+            paidImageUploadingRef.current = uploading;
+          }
         }}
         transform={(value) => {
           if (!value) return [];
