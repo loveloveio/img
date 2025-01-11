@@ -28,7 +28,9 @@ async function adminMiddleware(request: NextRequest) {
   if (user?.role === 'admin' && request.nextUrl.pathname.startsWith('/admin/sign-in')) {
     return NextResponse.redirect(new URL("/admin/dashboard", request.url));
   }
-  
+  if (user?.role !== 'admin') {
+    return new NextResponse('Not Found', { status: 404 });
+  }
   return NextResponse.next();
 }
 

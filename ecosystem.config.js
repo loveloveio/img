@@ -6,14 +6,14 @@ module.exports = {
       args: '--http-addr 127.0.0.1:7700',
       env: {
         MEILI_ENV: 'development',
-        MEILI_MASTER_KEY: process.env.MEILISEARCH_API_KEY
+        MEILI_MASTER_KEY: 'jtxLEA5ea-WyPaWJYb6MXVlZJx2mqocsbQ5idz7-X20'
       }
     },
     {
       name: 'web',
       cwd: './apps/web',
       script: 'yarn',
-      args: 'start',
+      args: 'start --port 3011',
       env: {
         NODE_ENV: 'development'
       }
