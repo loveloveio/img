@@ -10,7 +10,7 @@ const signInSchema = z.object({
     password: z.string()
         .min(6, "密码至少6个字符")
         .max(32, "密码最长32个字符")
-        .regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,32}$/, "密码必须包含字母和数字"),
+        .regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,32}$/, "密码必须包含字母和数字"),
     rememberMe: z.boolean().optional(),
 });
 export default function Page() {
