@@ -196,7 +196,6 @@ model User {
   giftCards                GiftCard[]
   browserHistories         BrowserHistory[]
   photoCollectionFavorites PhotoCollectionFavorite[]
-
   @@unique([email])
   @@unique([username])
   @@map("user")
@@ -415,3 +414,5 @@ model PhotoCollectionFavorite {
   @@index([photoCollectionId])
   @@map("photo_collection_favorites")
 }
+
+

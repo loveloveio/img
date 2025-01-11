@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
-import { r2 } from '@/config/r2';
+import { s3 } from '@/config/s3';
 import { prisma } from '@/libs/db';
 import { v4 as uuidv4 } from 'uuid';
 import { randomBytes } from 'crypto';
@@ -15,10 +15,10 @@ const ALLOWED_MIME_TYPES = [
 
 const s3Client = new S3Client({
   region: 'auto',
-  endpoint: r2.endpoint,
+  endpoint: s3.endpoint,
   credentials: {
-    accessKeyId: r2.accessKeyId,
-    secretAccessKey: r2.secretAccessKey,
+    accessKeyId: s3.accessKeyId,
+    secretAccessKey: s3.secretAccessKey,
   },
 });
 
@@ -71,14 +71,13 @@ export const POST = async (req: NextRequest) => {
 
     await s3Client.send(
       new PutObjectCommand({
-        Bucket: r2.bucketName,
+        Bucket: s3.bucketName,
         Key: filePath,
         Body: buffer,
         ContentType: file.type,
         ContentLength: file.size,
       })
     );
-
     const uploadRecord = await prisma.uploadFile.create({
       data: {
         filename: file.name,
@@ -87,7 +86,7 @@ export const POST = async (req: NextRequest) => {
         mimeType: file.type,
       },
     });
-    const publicUrl = `${r2.publicUrl}/${filePath}`;
+    const publicUrl = `${s3.publicUrl}/${filePath}`;
 
     return NextResponse.json({
       id: uploadRecord.id,

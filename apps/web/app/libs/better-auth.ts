@@ -1,5 +1,5 @@
 import { betterAuth } from "better-auth"
-import { admin, username } from "better-auth/plugins"
+import { admin, username,bearer } from "better-auth/plugins"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { prisma } from "@/libs/db";
 import { redis } from "@/libs/redis";
@@ -32,7 +32,8 @@ export const auth = betterAuth({
     }),
     plugins: [
         admin(),
-        username()
+        username(),
+        bearer()
     ],
     secondaryStorage: {
         get: async (key) => {
