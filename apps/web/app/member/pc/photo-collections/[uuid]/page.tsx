@@ -1,6 +1,6 @@
 'use client'
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { PhotoCollection } from '@prisma/client';
 import { PhotoCollectionCard } from '@/member/pc/components/photo-collection-card';
 import { Row, Image, Button } from 'antd';
@@ -19,49 +19,47 @@ export default function PhotoCollectionDetailPage() {
     const [images, setImages] = useState<{ src: string }[]>([]);
     const [isFavorite, setIsFavorite] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    const checkFavoriteStatus = useCallback(async () => {
+        try {
+            const response = await axios.get(`/api/member/photo-collection-favorites/${uuid}`);
+            console.log('checkFavoriteStatus', response.data.data.isFavorited);
+            setIsFavorite(response.data.data.isFavorited);
+        } catch (error) {
+            console.error('Error checking favorite status:', error);
+        }
+    },[])
+    const fetchPhotoCollection = useCallback(async () => {
+        try {
+            const response = await axios.get(`/api/member/photo-collections/${uuid}`);
+            const data = response.data;
+            if (data.code === 200) {
+                setPhotoCollection(data.data.photoCollection);
+                setImages([...data.data.photoCollection.previewImages, ...data.data.photoCollection.paidImages].map((image) => ({ src: image })));
+                setIsFavorite(data.data.photoCollection.isFavorite);
+            }
+        } catch (error) {
+            console.error('Error fetching photo collection:', error);
+        }
+    },[]);
+    const fetchRecommended = useCallback(async () => {
+        try {
+            const response = await axios.get('/api/member/photo-collections?recommend=true');
+            const data = response.data;
+            if (data.code === 200) {
+                // 排除自己
+                const filteredCollections = data.data.photoCollections.filter((collection: any) => collection.uuid !== uuid);
+                // 随机排序
+                const shuffledCollections = filteredCollections.sort(() => Math.random() - 0.5);
+                setRecommendedCollections(shuffledCollections);
+            }
+        } catch (error) {
+            console.error('Error fetching recommended collections:', error);
+        }
+    },[])
     const init = () => {
-        
-        const fetchPhotoCollection = async () => {
-            try {
-                const response = await axios.get(`/api/member/photo-collections/${uuid}`);
-                const data = response.data;
-                if (data.code === 200) {
-                    setPhotoCollection(data.data.photoCollection);
-                    setImages([...data.data.photoCollection.previewImages, ...data.data.photoCollection.paidImages].map((image) => ({ src: image })));
-                    setIsFavorite(data.data.photoCollection.isFavorite);
-                }
-            } catch (error) {
-                console.error('Error fetching photo collection:', error);
-            }
-        };
-        // 获取推荐相册
-        const fetchRecommended = async () => {
-            try {
-                const response = await axios.get('/api/member/photo-collections?recommend=true');
-                const data = response.data;
-                if (data.code === 200) {
-                    // 排除自己
-                    const filteredCollections = data.data.photoCollections.filter((collection: any) => collection.uuid !== uuid);
-                    // 随机排序
-                    const shuffledCollections = filteredCollections.sort(() => Math.random() - 0.5);
-                    setRecommendedCollections(shuffledCollections);
-                }
-            } catch (error) {
-                console.error('Error fetching recommended collections:', error);
-            }
-        };
-        const checkFavoriteStatus = async () => {
-            try {
-                const response = await axios.get(`/api/member/photo-collection-favorites/${uuid}`);
-                console.log('checkFavoriteStatus', response.data.data.isFavorited);
-                setIsFavorite(response.data.data.isFavorited);
-            } catch (error) {
-                console.error('Error checking favorite status:', error);
-            }
-        };
         fetchPhotoCollection();
         fetchRecommended();
-        checkFavoriteStatus();
     }
     useEffect(() => {
         if (!isPending) {
@@ -72,13 +70,17 @@ export default function PhotoCollectionDetailPage() {
                 } else {
                     dayjs(session.user.vipExpiredAt).isAfter(dayjs()) ? setIsVip(true) : setIsVip(false);
                 }
-                init();
+
+                checkFavoriteStatus();
+                
             } else {
                 setLogin(false);
             }
         }
     }, [session, isPending]);
-
+    useEffect(() => {
+        init();
+    },[])
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">

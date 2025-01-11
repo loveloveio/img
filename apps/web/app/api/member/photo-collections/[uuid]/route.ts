@@ -6,16 +6,17 @@ import dayjs from "dayjs";
 
 export const GET = async (
     req: NextRequest,
-    { params }: { params: Promise<{ uid: string }> }
+    { params }: { params: Promise<{ uuid: string }> }
 ) => {
     try {
         const session = await auth.api.getSession({
             headers: req.headers
         });
-        const { uid } = await params;
+        console.log('####session', session);
+        const { uuid } = await params;
         const collection = await prisma.photoCollection.findFirst({
             where: {
-                uuid:uid,
+                uuid: uuid,
                 status: PhotoCollectionStatus.ENABLED,
                 deletedAt: null
             },
@@ -38,14 +39,17 @@ export const GET = async (
                 message: "Photo collection not found"
             }, { status: 404 });
         }
+        let isValidVip = false;
+        if (session) {
+            const member = await prisma.user.findUnique({
+                where: { id: session?.user.id },
+                select: {
+                    vipExpiredAt: true
+                }
+            });
+            isValidVip = (member?.vipExpiredAt && dayjs().isBefore(member.vipExpiredAt)) || false;
+        }
 
-        const member = await prisma.user.findUnique({
-            where: { id: session?.user.id },
-            select: {
-                vipExpiredAt: true
-            }
-        });
-        const isValidVip = member?.vipExpiredAt && dayjs().isBefore(member.vipExpiredAt);
 
         return NextResponse.json({
             code: 200,
