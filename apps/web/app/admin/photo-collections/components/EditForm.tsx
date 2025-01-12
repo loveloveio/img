@@ -119,7 +119,7 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
         const activeIndex = prev.findIndex((i) => i.uid === active.id);
         const overIndex = prev.findIndex((i) => i.uid === over?.id);
         if (prev[activeIndex]?.isCover) {
-          return prev; // Do not move the cover image
+          return prev;
         }
         if (prev[activeIndex]?.isPaid !== prev[overIndex]?.isPaid){
           return prev;
@@ -214,7 +214,16 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
     }
     if (!open) {
       setImageFiles([]);
-      formRef.current?.resetFields();
+      formRef.current?.setFieldsValue({
+        imageFiles: [],
+        sort: 10,
+        status: PaymentMethodStatus.ENABLED,
+        recommend: false,
+        tags: [],
+        title: '',
+        subtitle: '',
+        description: ''
+      });
     }
   }, [open, initialValues]);
   return (
@@ -223,7 +232,14 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
       title={title}
       open={open}
       onOpenChange={onOpenChange}
-      initialValues={initialValues}
+      initialValues={{
+        ...initialValues,
+        imageFiles: initialValues?.imageFiles ?? [],
+        tags: initialValues?.tags ?? [],
+        sort: initialValues?.sort ?? 10,
+        status: initialValues?.status ?? PaymentMethodStatus.ENABLED,
+        recommend: initialValues?.recommend ?? false,
+      }}
       onFinish={handleSubmit}
       modalProps={{
         onCancel: () => {
@@ -263,10 +279,10 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
       <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
       <SortableContext items={imageFiles.map((i) => i.uid)} strategy={horizontalListSortingStrategy}>
       <ProFormUploadButton
-        name="previewImages"
+        name="imageFiles"
         label="图片列表"
         max={200}
-        initialValue={initialValues?.previewImages}
+        initialValue={initialValues?.imageFiles}
         action="/api/admin/upload"
         fileList={imageFiles}
         fieldProps={{
@@ -286,7 +302,6 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
               isCover: false,
               isPaid: true,
             }
-            console.log('t',t);
             setImageFiles((pre) => [...pre, t]);
             currentRequestQueue.current.add(() => {
               const formData = new FormData();
@@ -297,12 +312,17 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
                 }
               })
             }).then((response: any) => {
-              setImageFiles((pre) => {
-                const cover = pre.find((item) => item.isCover);
-                const isCover = !cover;
-                const isPaid = !isCover;
-                return pre.map((item) => item.uid === file.uid ? { ...item, status: 'done', url: response.data.url, thumbUrl: response.data.url, isCover, isPaid } : item)
-              });
+              if(response.data.url) {
+                setImageFiles((pre) => {
+                  const cover = pre.find((item) => item.isCover);
+                  const isCover = !cover;
+                  const isPaid = !isCover;
+                  return pre.map((item) => item.uid === file.uid ? { ...item, status: 'done', url: response.data.url, thumbUrl: response.data.url, isCover, isPaid } : item)
+                });
+              }else{
+                message.error('图片上传失败',response);
+                setImageFiles((pre) => pre.map((item) => item.uid === file.uid ? { ...item, status: 'error' } : item));
+              }
             })
               .catch(error => {
                 console.error('文件上传失败:', error);
@@ -317,7 +337,6 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
           itemRender: (originNode, file) => {
             const f = imageFiles.find((item) => item.uid === file.uid);
             if (!f) return null;
-            console.log('f',f);
             return <DraggableUploadListItem originNode={<div className='w-[102px] h-[102px] relative'>
               <Dropdown menu={{ items: [{ label: f?.isCover ? '取消封面' : '设为封面', key: 'cover/' + f?.uid }, f?.isCover ? null : { label: f?.isPaid ? '设为免费' : '取消免费', key: 'free/' + f?.uid }], onClick: handleMenuClick }}>
                 {originNode}

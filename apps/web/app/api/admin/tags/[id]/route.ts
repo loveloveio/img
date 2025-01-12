@@ -39,6 +39,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
             id: Number(tag.id)
         });
     } catch (error) {
+        console.error(error);
         return errorResponse(500, "服务器错误");
     }
 }

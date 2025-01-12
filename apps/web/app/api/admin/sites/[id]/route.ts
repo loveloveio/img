@@ -28,6 +28,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
       }
     });
   } catch (error) {
+    console.error(error);
     return NextResponse.json({
       code: 500,
       message: '服务器错误'

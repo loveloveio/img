@@ -1,11 +1,9 @@
 'use client';
-import { Form, Input, Button, Layout, Typography, Card } from 'antd';
+import { Form, Input, Button, Typography, Card } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { authClient } from '@/libs/better-client';
-
-const { Content } = Layout;
 const { Title } = Typography;
 
 export default function SignInPage() {
@@ -32,16 +30,13 @@ export default function SignInPage() {
       toast.success('登录成功');
       router.push('/member');
     } catch (error) {
+      console.error(error);
       toast.error('登录失败，请检查用户名和密码');
     }
   };
 
   return (
-    <Content style={{ 
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}>
+    <div className='w-full h-full flex flex-1 justify-center items-center'>
       <Card style={{ 
         width: '100%',
         maxWidth: 400,
@@ -98,6 +93,6 @@ export default function SignInPage() {
           </Form.Item>
         </Form>
       </Card>
-    </Content>
+    </div>
   );
 }

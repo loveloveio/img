@@ -2,7 +2,7 @@
 import { Tab, Tabs } from "@nextui-org/react";
 import { TabLayout } from "./components/tab-layout";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { LoadingOutlined, SearchOutlined } from "@ant-design/icons";
 import { PhotoCollection, Tag } from "@prisma/client";
 import axios from "axios";
@@ -23,7 +23,7 @@ export default function Mobile() {
     const [hasMore, setHasMore] = useState<boolean>(true);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const fetchPhotoCollections = async (params: {
+    const fetchPhotoCollections = useCallback(async (params: {
         keywords: string;
         page: number;
         pageSize: number;
@@ -58,7 +58,7 @@ export default function Mobile() {
             setLoading(false);
             loadingRef.current = false;
         }
-    };
+    }, []);
 
     useEffect(() => {
         const fetchTags = async () => {

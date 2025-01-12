@@ -25,7 +25,8 @@ export async function GET(req: NextRequest) {
         const result = await index?.search(params.q, {
             filter: filter,
             limit: params.pageSize,
-            offset: (params.page - 1) * params.pageSize
+            offset: (params.page - 1) * params.pageSize,
+            sort: ['createdAt:desc']
         });
         const photoCollections = ((result?.hits ?? []) as PhotoCollection[]).map(item => ({
             uuid: item.uuid,

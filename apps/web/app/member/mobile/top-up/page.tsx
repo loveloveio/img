@@ -1,7 +1,7 @@
 'use client'
 import { NavBar } from "@/member/mobile/components/nav-bar";
 import { PaymentMethod, VipPackage } from "@prisma/client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Checkbox } from "@nextui-org/react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -9,20 +9,20 @@ export default function TopupPage() {
   const [vipPackages, setVipPackages] = useState<VipPackage[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [selectedVipPackage, setSelectedVipPackage] = useState<number | null>(null);
-  const fetchVipPackages = async () => {
+  const fetchVipPackages = useCallback(async () => {
     const response = await axios.get('/api/member/vip-packages');
     if(response.data.code === 200 && response.data.data.vipPackages){
       setVipPackages(response.data.data.vipPackages);
       setSelectedVipPackage(response.data.data.vipPackages[0].id);
     }
-  }
-  const fetchPaymentMethods = async () => {
+  }, []);
+  const fetchPaymentMethods = useCallback(async () => {
     const response = await axios.get('/api/member/payment-methods');
     if(response.data.code === 200 && response.data.data.paymentMethods){
       
       setPaymentMethods(response.data.data.paymentMethods);
     }
-  }
+  }, []);
   useEffect(() => {
     fetchVipPackages();
     fetchPaymentMethods();

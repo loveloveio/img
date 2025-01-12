@@ -1,12 +1,10 @@
 'use client';
-import { Form, Input, Button, Layout, Typography, Card, message } from 'antd';
+import { Form, Input, Button, Typography, Card, message } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { authClient } from '@/libs/better-client';
 import { z } from 'zod';
-
-const { Content } = Layout;
 const { Title } = Typography;
 
 const signUpSchema = z.object({
@@ -67,11 +65,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <Content style={{ 
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-    }}>
+    <div className='w-full h-full flex flex-1 justify-center items-center'>
       <Card style={{ 
         width: '100%',
         maxWidth: 400,
@@ -147,6 +141,6 @@ export default function SignUpPage() {
           </Form.Item>
         </Form>
       </Card>
-    </Content>
+      </div>
   );
 }

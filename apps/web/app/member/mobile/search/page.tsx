@@ -1,6 +1,6 @@
 'use client';
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useRef, Suspense } from "react";
+import { useEffect, useState, useRef, Suspense, useCallback } from "react";
 import { LoadingOutlined, SearchOutlined } from "@ant-design/icons";
 import { PhotoCollection } from "@prisma/client";
 import axios from "axios";
@@ -25,7 +25,7 @@ function SearchContent() {
     const [hasMore, setHasMore] = useState<boolean>(true);
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const fetchPhotoCollections = async (params: {
+    const fetchPhotoCollections = useCallback(async (params: {
         keyword: string;
         page: number;
         pageSize: number;
@@ -60,7 +60,7 @@ function SearchContent() {
             setLoading(false);
             loadingRef.current = false;
         }
-    };
+    }, []);
 
     useEffect(() => {
         const container = containerRef.current;

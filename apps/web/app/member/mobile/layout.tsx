@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {UAParser} from "ua-parser-js";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             // 将移动端页面重定向到pc页面
             router.push(location.href.replace('mobile', 'pc'));
         }   
-    }, []);
+    });
     return <>{children}</>
   ;
 }

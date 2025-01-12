@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Button, Card, Row, Col, Empty, Spin } from 'antd';
+import { Button, Card, Row, Empty, Spin } from 'antd';
 import { PhotoCollection } from '@prisma/client';
 import { PhotoCollectionCard } from '../components/photo-collection-card';
 import axios from 'axios';

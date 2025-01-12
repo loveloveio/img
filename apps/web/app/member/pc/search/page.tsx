@@ -1,5 +1,5 @@
 'use client';
-import { Suspense } from 'react';
+import { Suspense, useCallback } from 'react';
 import { useEffect, useState } from "react";
 import { Input, Row, Spin, Empty, Button } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
@@ -26,7 +26,7 @@ function SearchContent() {
     const [hasMore, setHasMore] = useState(true);
     const pageSize = 20;
 
-    const handleSearch = async (currentPage: number, append: boolean = false) => {
+    const handleSearch = useCallback(async (currentPage: number, append: boolean = false) => {
         if (!keyword.trim()) return;
 
         setLoading(true);
@@ -56,7 +56,7 @@ function SearchContent() {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         setPage(1);

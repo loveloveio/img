@@ -14,6 +14,11 @@
             "date": 1736463593456,
             "name": "logs/payment-callback-2025-01-10.log",
             "hash": "92c16c0e35b25505de779207ab09aa91a38ed0b88de84cb60481eb88750d0458"
+        },
+        {
+            "date": 1736629819973,
+            "name": "logs/payment-callback-2025-01-12.log",
+            "hash": "6e60de4559d9eb1d051ff2b9d009e7350563ba5718a1ab64dd7296091e833508"
         }
     ],
     "hashType": "sha256"

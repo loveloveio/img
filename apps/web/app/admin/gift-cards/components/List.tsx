@@ -42,7 +42,7 @@ export const List = () => {
     },
     {
       title: '使用会员',
-      dataIndex: ['member', 'username'],
+      dataIndex: ['user', 'username'],
       width: 200,
       search: false
     },

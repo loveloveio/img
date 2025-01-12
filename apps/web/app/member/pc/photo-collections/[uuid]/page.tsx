@@ -92,7 +92,7 @@ export default function PhotoCollectionDetailPage() {
                         type={isFavorite ? "primary" : "default"}
                         onClick={async () => {
                             if (!login) {
-                                router.push('/member/mobile/login');
+                                router.push('/member/pc/sign-in');
                                 return;
                             }
                             try {

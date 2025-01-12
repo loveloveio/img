@@ -2,7 +2,6 @@
 
 import { Layout, Avatar, Dropdown, Button, Space } from 'antd';
 import { useRouter } from 'next/navigation';
-import { UserOutlined } from '@ant-design/icons';
 import { authClient } from '@/libs/better-client';
 
 const { Header } = Layout;

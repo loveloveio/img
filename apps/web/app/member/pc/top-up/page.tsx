@@ -3,6 +3,7 @@ import { PaymentMethod, VipPackage } from "@prisma/client";
 import { useState, useEffect } from "react";
 import { Card, Layout, Typography, Radio, Button, message } from "antd";
 import axios from "axios";
+import Image from "next/image";
 const { Content } = Layout;
 const { Title } = Typography;
 
@@ -100,7 +101,7 @@ export default function TopupPage() {
                 >
                   <Radio value={Number(item.id)} className="w-full">
                     <div className="flex items-center">
-                      <img src={item.icon || ''} alt={item.name} className="w-8 h-8 mr-3" />
+                      <Image src={item.icon || ''} alt={item.name} className="w-8 h-8 mr-3" />
                       <span className="text-base">{item.name}</span>
                     </div>
                   </Radio>

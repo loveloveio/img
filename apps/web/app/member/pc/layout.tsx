@@ -18,10 +18,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             // 将移动端页面重定向到pc页面
             router.push(location.href.replace('mobile', 'pc'));
         }   
-    }, []);
+    });
     return <Layout className="flex w-screen min-h-screen">
         <NavBar />
-        <Content className="flex-1 w-full h-full">
+        <Content className="flex-1 w-full h-full flex flex-col">
             {children}
         </Content>
     </Layout>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import Script from "next/script";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -25,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <script defer src="https://cloud.umami.is/script.js" data-website-id="af22bceb-33a5-450b-af0f-f138987b736a"></script>
+      <Script defer src="https://cloud.umami.is/script.js" data-website-id="af22bceb-33a5-450b-af0f-f138987b736a"></Script>
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
       {children}
       </body>

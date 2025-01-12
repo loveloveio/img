@@ -25,6 +25,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
       data: vipPackage,
     });
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       {
         code: 500,

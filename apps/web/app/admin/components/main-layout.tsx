@@ -158,7 +158,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
             })
           }}
         >
-          退出{collapsed ? '展开' : '折叠'}
+         {collapsed ? ' 退出' : ''}
         </Button>
       )}
     >
