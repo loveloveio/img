@@ -10,7 +10,7 @@ async function adminMiddleware(request: NextRequest) {
   const { data: session } = await betterFetch<Session>(
     "/api/auth/get-session",
     {
-      baseURL: process.env.APP_URL,
+      baseURL: process.env.LOCAL_AUTH_URL,
       headers: {
         cookie: request.headers.get("cookie") || "",
       },
@@ -21,12 +21,12 @@ async function adminMiddleware(request: NextRequest) {
     if (request.nextUrl.pathname.startsWith('/admin/sign-in')) {
       return NextResponse.next();
     }
-    return NextResponse.redirect(new URL("/admin/sign-in", request.url));
+    return NextResponse.redirect(new URL("/admin/sign-in", process.env.APP_URL));
   }
 
   const user = session.user;
   if (user?.role === 'admin' && request.nextUrl.pathname.startsWith('/admin/sign-in')) {
-    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
+    return NextResponse.redirect(new URL("/admin/dashboard", process.env.APP_URL));
   }
   if (user?.role !== 'admin') {
     return new NextResponse('Not Found', { status: 404 });
@@ -38,7 +38,7 @@ async function memberMiddleware(request: NextRequest) {
   const { data: session } = await betterFetch<Session>(
     "/api/auth/get-session",
     {
-      baseURL: process.env.APP_URL,
+      baseURL: process.env.LOCAL_AUTH_URL,
       headers: {
         cookie: request.headers.get("cookie") || "",
       },
@@ -48,17 +48,17 @@ async function memberMiddleware(request: NextRequest) {
   if (!session && request.nextUrl.pathname.startsWith('/profile')) {
     const ua = UAParser(request.headers.get('user-agent') || '');
     if (ua.device.is('mobile')) {
-      return NextResponse.redirect(new URL("/mobile/sign-in", request.url));
+      return NextResponse.redirect(new URL("/mobile/sign-in", process.env.APP_URL));
     }
-    return NextResponse.redirect(new URL("/pc/sign-in", request.url));
+    return NextResponse.redirect(new URL("/pc/sign-in", process.env.APP_URL));
   }
 
   if (session) {
     if (request.nextUrl.pathname.startsWith('/pc/sign-in')) {
-      return NextResponse.redirect(new URL("/pc", request.url));
+      return NextResponse.redirect(new URL("/pc", process.env.APP_URL));
     }
     if (request.nextUrl.pathname.startsWith('/mobile/sign-in')) {
-      return NextResponse.redirect(new URL("/mobile", request.url));
+      return NextResponse.redirect(new URL("/mobile", process.env.APP_URL));
     }
   }
 
