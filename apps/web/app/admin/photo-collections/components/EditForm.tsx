@@ -1,7 +1,7 @@
 'use client';
 
-import { ModalForm, ProFormText, ProFormRadio, ProFormUploadButton, ProFormDigit, ProFormTextArea, ProFormSelect, ProFormInstance } from '@ant-design/pro-components';
-import { Image, message, Dropdown } from 'antd';
+import { ModalForm, ProFormText, ProFormRadio, ProFormUploadButton, ProFormDigit, ProFormTextArea, ProFormSelect, ProFormInstance, ProForm } from '@ant-design/pro-components';
+import { Image, message, Dropdown, Button } from 'antd';
 import axios from 'axios';
 import { RiImageCircleLine, RiCreativeCommonsNcLine, RiMoneyDollarCircleLine } from "@remixicon/react";
 import { PaymentMethodStatus } from '@prisma/client';
@@ -121,12 +121,12 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
         if (prev[activeIndex]?.isCover) {
           return prev;
         }
-        if (prev[activeIndex]?.isPaid !== prev[overIndex]?.isPaid){
+        if (prev[activeIndex]?.isPaid !== prev[overIndex]?.isPaid) {
           return prev;
         }
         return arrayMove(prev, activeIndex, overIndex);
       });
-      
+
     }
   };
   const handleMenuClick: MenuProps['onClick'] = (e) => {
@@ -135,8 +135,8 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
       setImageFiles((pre) => {
         const cover = pre.find((item) => item.isCover);
         if (!cover || cover.uid !== uid) {
-          return pre.map((item, index) => 
-            item.uid === uid 
+          return pre.map((item, index) =>
+            item.uid === uid
               ? { ...item, isCover: true, isPaid: false, order: 0 }
               : { ...item, isCover: false, order: index + 1 }
           ).sort((a, b) => a.order - b.order);
@@ -146,7 +146,7 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
     } else if (type === 'free') {
       setImageFiles((pre) => {
         const updatedFiles = pre.map((item) => item.uid === uid ? { ...item, isPaid: !item.isPaid } : item);
-        console.log('updatedFiles',updatedFiles);
+        console.log('updatedFiles', updatedFiles);
         const cover = updatedFiles.find((item) => item.isCover);
         const freeFiles = updatedFiles.filter((item) => !item.isPaid && !item.isCover);
         const paidFiles = updatedFiles.filter((item) => item.isPaid && !item.isCover);
@@ -154,7 +154,7 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
           freeFiles[0]!.isCover = true;
           freeFiles[0]!.isPaid = false;
         }
-        
+
         return cover ? [cover, ...freeFiles, ...paidFiles] : [...freeFiles, ...paidFiles];
       });
     }
@@ -276,94 +276,134 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
         label="标签"
         mode="tags"
       />
-      <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-      <SortableContext items={imageFiles.map((i) => i.uid)} strategy={horizontalListSortingStrategy}>
-      <ProFormUploadButton
-        name="imageFiles"
-        label="图片列表"
-        max={200}
-        initialValue={initialValues?.imageFiles}
-        action="/api/admin/upload"
-        fileList={imageFiles}
-        fieldProps={{
-          name: 'file',
-          listType: 'picture-card',
-          multiple: true,
-          onPreview: (file) => {
-            handlePreview(file as PhotoCollectionImage);
-          },
-          beforeUpload: (file) => {
-            const t: PhotoCollectionImage = {
-              uid: file.uid,
-              name: file.name,
-              thumbUrl: '',
-              status: 'uploading',
-              originFileObj: file,
-              isCover: false,
-              isPaid: true,
-            }
-            setImageFiles((pre) => [...pre, t]);
-            currentRequestQueue.current.add(() => {
-              const formData = new FormData();
-              formData.append('file', file);
-              return axios.post('/api/admin/upload', formData, {
-                headers: {
-                  'Content-Type': 'multipart/form-data'
+      <ProForm.Group>
+        {imageFiles.filter((item) => item.status =='error').length > 0 && <Button type='primary' onClick={() => {
+          const errorFiles = imageFiles.filter((item) => item.status == 'error');
+          setImageFiles((pre) => pre.map((item) => item.status == 'error' ? { ...item, status:undefined } : item));
+          setTimeout(() =>{
+            errorFiles.forEach((item) => {
+              const file = item.originFileObj as FileType;
+              currentRequestQueue.current.add(() => {
+                const formData = new FormData();
+                formData.append('file', file);
+                return axios.post('/api/admin/upload', formData, {
+                  headers: {
+                    'Content-Type': 'multipart/form-data'
+                  }
+                })
+              }).then((response: any) => {
+                if (response.data.url) {
+                  setImageFiles((pre) => {
+                    const cover = pre.find((item) => item.isCover);
+                    const isCover = !cover;
+                    const isPaid = !isCover;
+                    return pre.map((item) => item.uid === file.uid ? { ...item, status: 'done', url: response.data.url, thumbUrl: response.data.url, isCover, isPaid } : item)
+                  });
+                } else {
+
+                  setImageFiles((pre) => pre.map((item) => item.uid === file.uid ? { ...item, status: 'error' } : item));
                 }
               })
-            }).then((response: any) => {
-              if(response.data.url) {
-                setImageFiles((pre) => {
-                  const cover = pre.find((item) => item.isCover);
-                  const isCover = !cover;
-                  const isPaid = !isCover;
-                  return pre.map((item) => item.uid === file.uid ? { ...item, status: 'done', url: response.data.url, thumbUrl: response.data.url, isCover, isPaid } : item)
-                });
-              }else{
-                message.error('图片上传失败',response);
-                setImageFiles((pre) => pre.map((item) => item.uid === file.uid ? { ...item, status: 'error' } : item));
-              }
+                .catch(error => {
+                  console.error('文件上传失败:', error);
+                  setImageFiles((pre) => pre.map((item) => item.uid === file.uid ? { ...item, status: 'error' } : item));
+                });;
             })
-              .catch(error => {
-                console.error('文件上传失败:', error);
-                setImageFiles((pre) => pre.map((item) => item.uid === file.uid ? { ...item, status: 'error' } : item));
-              });;
-            return false;
-          },
-          onRemove: (file) => {
-            if (file.status === 'uploading') return false;
-            setImageFiles((pre) => pre.filter((item) => item.uid !== file.uid));
-          },
-          itemRender: (originNode, file) => {
-            const f = imageFiles.find((item) => item.uid === file.uid);
-            if (!f) return null;
-            return <DraggableUploadListItem originNode={<div className='w-[102px] h-[102px] relative'>
-              <Dropdown menu={{ items: [{ label: f?.isCover ? '取消封面' : '设为封面', key: 'cover/' + f?.uid }, f?.isCover ? null : { label: f?.isPaid ? '设为免费' : '取消免费', key: 'free/' + f?.uid }], onClick: handleMenuClick }}>
-                {originNode}
-              </Dropdown>
-              <div className='absolute bottom-1 right-1 flex'>
-                {f?.isCover && <RiImageCircleLine size={20} style={{ color: '#1890ff' }} />}
-                {f?.isPaid && <RiMoneyDollarCircleLine size={20} style={{ color: '#faad14' }} /> }
-                {!f?.isPaid && <RiCreativeCommonsNcLine size={20} style={{ color: '#52c41a' }} />}
-              </div>
-            </div>} file={f} />
-          }
-        }}
-        transform={(value) => {
-          if (!value) return [];
-          const cover = imageFiles.find((item) => item.isCover);
-          const previewImages = imageFiles.filter((item) => !item.isPaid).map((item) => item.url);
-          const paidImages = imageFiles.filter((item) => item.isPaid).map((item) => item.url);
-          return {
-            previewImages,
-            cover: cover?.url ?? null,
-            paidImages
-          }
-        }}
-        rules={[{ required: true, message: '请上传预览图片' }]}
-      />
-       </SortableContext>
-      </DndContext>
+          }, 1000);
+        }}>重新上传{imageFiles.filter((item) => item.status == 'error').length}张 </Button>}
+        <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
+          <SortableContext items={imageFiles.map((i) => i.uid)} strategy={horizontalListSortingStrategy}>
+
+            <ProFormUploadButton
+              name="imageFiles"
+              label="图片列表"
+              max={200}
+              initialValue={initialValues?.imageFiles}
+              action="/api/admin/upload"
+              fileList={imageFiles}
+              accept='image/*'
+              fieldProps={{
+                name: 'file',
+                listType: 'picture-card',
+                multiple: true,
+                onPreview: (file) => {
+                  handlePreview(file as PhotoCollectionImage);
+                },
+                beforeUpload: (file) => {
+                  const t: PhotoCollectionImage = {
+                    uid: file.uid,
+                    name: file.name,
+                    thumbUrl: '',
+                    status: 'uploading',
+                    originFileObj: file,
+                    isCover: false,
+                    isPaid: true,
+                  }
+                  setImageFiles((pre) => [...pre, t]);
+                  currentRequestQueue.current.add(() => {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    return axios.post('/api/admin/upload', formData, {
+                      headers: {
+                        'Content-Type': 'multipart/form-data'
+                      }
+                    })
+                  }).then((response: any) => {
+                    if (response.data.url) {
+                      setImageFiles((pre) => {
+                        const cover = pre.find((item) => item.isCover);
+                        const isCover = !cover;
+                        const isPaid = !isCover;
+                        return pre.map((item) => item.uid === file.uid ? { ...item, status: 'done', url: response.data.url, thumbUrl: response.data.url, isCover, isPaid } : item)
+                      });
+                    } else {
+
+                      setImageFiles((pre) => pre.map((item) => item.uid === file.uid ? { ...item, status: 'error' } : item));
+                    }
+                  })
+                    .catch(error => {
+                      console.error('文件上传失败:', error);
+                      setImageFiles((pre) => pre.map((item) => item.uid === file.uid ? { ...item, status: 'error' } : item));
+                    });
+                  return false;
+                },
+                onRemove: (file) => {
+                  if (file.status === 'uploading') return false;
+                  setImageFiles((pre) => pre.filter((item) => item.uid !== file.uid));
+                },
+                itemRender: (originNode, file) => {
+                  const f = imageFiles.find((item) => item.uid === file.uid);
+                  if (!f) return null;
+                  return <DraggableUploadListItem originNode={<div className='w-[102px] h-[102px] relative'>
+                    <Dropdown menu={{ items: [{ label: f?.isCover ? '取消封面' : '设为封面', key: 'cover/' + f?.uid }, f?.isCover ? null : { label: f?.isPaid ? '设为免费' : '取消免费', key: 'free/' + f?.uid }], onClick: handleMenuClick }}>
+                      {originNode}
+                    </Dropdown>
+                    <div className='absolute bottom-1 right-1 flex'>
+                      {f?.isCover && <RiImageCircleLine size={20} style={{ color: '#1890ff' }} />}
+                      {f?.isPaid && <RiMoneyDollarCircleLine size={20} style={{ color: '#faad14' }} />}
+                      {!f?.isPaid && <RiCreativeCommonsNcLine size={20} style={{ color: '#52c41a' }} />}
+                    </div>
+                  </div>} file={f} />
+                }
+              }}
+              transform={(value) => {
+                if (!value) return [];
+                const cover = imageFiles.find((item) => item.isCover);
+                const previewImages = imageFiles.filter((item) => !item.isPaid).map((item) => item.url);
+                const paidImages = imageFiles.filter((item) => item.isPaid).map((item) => item.url);
+                return {
+                  previewImages,
+                  cover: cover?.url ?? null,
+                  paidImages
+                }
+              }}
+              rules={[{ required: true, message: '请上传预览图片' }]}
+            />
+          </SortableContext>
+        </DndContext>
+        
+      </ProForm.Group>
+
       <div style={{ display: 'flex', gap: '16px' }}>
         <ProFormRadio.Group
           name="status"
