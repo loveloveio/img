@@ -276,8 +276,8 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
         label="标签"
         mode="tags"
       />
-      <ProForm.Group>
-        {imageFiles.filter((item) => item.status =='error').length > 0 && <Button type='primary' onClick={() => {
+      <div>
+      {imageFiles.filter((item) => item.status =='error').length > 0 && <Button color="danger" variant="solid" onClick={() => {
           const errorFiles = imageFiles.filter((item) => item.status == 'error');
           setImageFiles((pre) => pre.map((item) => item.status == 'error' ? { ...item, status:undefined } : item));
           setTimeout(() =>{
@@ -311,6 +311,9 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
             })
           }, 1000);
         }}>重新上传{imageFiles.filter((item) => item.status == 'error').length}张 </Button>}
+      </div>
+      <ProForm.Group>
+        
         <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
           <SortableContext items={imageFiles.map((i) => i.uid)} strategy={horizontalListSortingStrategy}>
 
