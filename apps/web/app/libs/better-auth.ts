@@ -5,6 +5,10 @@ import { prisma } from "@/libs/db";
 import { redis } from "@/libs/redis";
 
 export const auth = betterAuth({
+    rateLimit: {
+        window: 60, // time window in seconds
+        max: 1000, // max requests in the window
+    },
     trustedOrigins: [
         'https://photos.splive.top',
         'https://bw.splive.top',
