@@ -21,6 +21,8 @@ async function adminMiddleware(request: NextRequest) {
     if (request.nextUrl.pathname.startsWith('/admin/sign-in')) {
       return NextResponse.next();
     }
+    console.log('redirect to sign-in', process.env.APP_URL);
+    console.log('redirect to sign-in req', request);
     return NextResponse.redirect(new URL("/admin/sign-in", process.env.APP_URL));
   }
 

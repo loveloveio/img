@@ -113,9 +113,7 @@ export const POST = async (req: NextRequest) => {
       status: z.enum([PhotoCollectionStatus.ENABLED, PhotoCollectionStatus.DISABLED]).optional().default(PhotoCollectionStatus.ENABLED),
       recommend: z.boolean().optional().default(false)
     });
-    console.log(body);
     const data = await createSchema.parseAsync(body);
-    console.log(data);
     const imageCount = (data.paidImages?.length || 0) + (data.previewImages?.length || 0);
     const photoCollection = await prisma.photoCollection.create({
       data: {
