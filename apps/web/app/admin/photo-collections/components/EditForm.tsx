@@ -83,6 +83,8 @@ class RequestQueue {
     } catch (error) {
       reject(error);
     } finally {
+      console.log('processing', this.processing);
+      await new Promise(resolve => setTimeout(resolve, 500));
       this.processing--;
       this.processQueue();
     }
