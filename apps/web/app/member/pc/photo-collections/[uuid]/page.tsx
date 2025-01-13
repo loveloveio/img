@@ -3,7 +3,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { PhotoCollection } from '@prisma/client';
 import { PhotoCollectionCard } from '@/member/pc/components/photo-collection-card';
-import { Row, Image, Button } from 'antd';
+import { Image, Button } from 'antd';
 import { authClient } from '@/libs/better-client';
 import dayjs from 'dayjs';
 import axios from 'axios';
@@ -28,7 +28,7 @@ export default function PhotoCollectionDetailPage() {
         } catch (error) {
             console.error('Error checking favorite status:', error);
         }
-    },[])
+    }, [])
     const fetchPhotoCollection = useCallback(async () => {
         try {
             const response = await axios.get(`/api/member/photo-collections/${uuid}`);
@@ -44,7 +44,7 @@ export default function PhotoCollectionDetailPage() {
         } catch (error) {
             console.error('Error fetching photo collection:', error);
         }
-    },[]);
+    }, []);
     const fetchRecommended = useCallback(async () => {
         try {
             const response = await axios.get('/api/member/photo-collections?recommend=true');
@@ -59,7 +59,7 @@ export default function PhotoCollectionDetailPage() {
         } catch (error) {
             console.error('Error fetching recommended collections:', error);
         }
-    },[])
+    }, [])
     const init = () => {
         fetchPhotoCollection();
         fetchRecommended();
@@ -75,7 +75,7 @@ export default function PhotoCollectionDetailPage() {
                 }
 
                 checkFavoriteStatus();
-                
+
             } else {
                 setLogin(false);
             }
@@ -83,11 +83,10 @@ export default function PhotoCollectionDetailPage() {
     }, [session, isPending]);
     useEffect(() => {
         init();
-    },[])
+    }, [])
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
-            {/* 相册详情 */}
             <div className="mb-8">
                 <div className="flex justify-between items-center">
                     <h1 className="text-3xl font-bold mb-4">{photoCollection?.title}</h1>
@@ -149,11 +148,13 @@ export default function PhotoCollectionDetailPage() {
 
             <div className="mt-12">
                 <h2 className="text-2xl font-bold mb-6">💝 猜你喜欢</h2>
-                <Row gutter={[24, 24]}>
-                    {recommendedCollections.map((collection) => (
-                        <PhotoCollectionCard key={collection.uuid} item={collection} />
+                <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+                    {recommendedCollections.map((album) => (
+                        <div key={album.id} className="mb-4 break-inside-avoid">
+                            <PhotoCollectionCard item={album} />
+                        </div>
                     ))}
-                </Row>
+                </div>
             </div>
         </div>
     );

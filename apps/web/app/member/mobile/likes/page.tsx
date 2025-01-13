@@ -61,15 +61,13 @@ export default function LikesPage() {
         <>
             <NavBar title="我的收藏" />
             <div className="p-4">
-                <div className="grid grid-cols-2 gap-4">
-                    {favorites.map((favorite) => (
-                        <PhotoCollectionCard
-                            key={favorite.uuid}
-                            item={favorite}
-                        />
-                    ))}
+                <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
+                  {favorites.map((album) => (
+                    <div key={album.id} className="mb-4 break-inside-avoid">
+                      <PhotoCollectionCard item={album} />
+                    </div>
+                  ))}
                 </div>
-
                 {hasMore && (
                     <div className="mt-4 text-center">
                         <Button

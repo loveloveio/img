@@ -9,11 +9,13 @@ export interface PhotoCollectionCardProps {
 export const PhotoCollectionCard = ({ item }: PhotoCollectionCardProps) => {
   const router = useRouter();
   return <div onClick={() => router.push(`/member/mobile/photo-collections/${item.uuid}`)} className="bg-white dark:bg-gray-800 shadow-md overflow-hidden relative">
-    <img
-      src={item.cover ? item.cover+'?imageMogr2/format/webp/thumbnail/432x288/pad/1/color/IzNEM0QzRA' : ''}
-      alt={item.title}
-      className="w-full"
-    />
+    <div className='w-full bg-gray-100 flex items-center justify-center'>
+      <img
+        src={item.cover ? item.cover + '?imageMogr2/format/webp/thumbnail/432x' : ''}
+        alt={item.title}
+        className="w-full"
+      />
+    </div>
     {item.recommend && (
       <div className="absolute top-0 right-0">
         <span className="text-xs text-white bg-red-500 px-2 py-1">推荐</span>

@@ -64,11 +64,13 @@ export default function LikesPage() {
           <Spin spinning={loading && favorites.length === 0}>
             {favorites.length > 0 ? (
               <>
-                <Row gutter={[24, 24]}>
+                <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
                   {favorites.map((album) => (
-                    <PhotoCollectionCard key={album.id} item={album} />
+                    <div key={album.id} className="mb-4 break-inside-avoid">
+                      <PhotoCollectionCard item={album} />
+                    </div>
                   ))}
-                </Row>
+                </div>
 
                 {hasMore && (
                   <div className="text-center mt-12">

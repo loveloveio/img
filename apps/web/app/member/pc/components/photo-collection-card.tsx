@@ -21,14 +21,16 @@ export const PhotoCollectionCard = ({ item }: PhotoCollectionCardProps) => {
     hoverable
     cover={
       <div style={{ background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <img 
-          src={item.cover  ? item.cover+'?imageMogr2/format/webp/thumbnail/432x288/pad/1/color/IzNEM0QzRA' :  ''} 
-          alt={item.title} 
-          style={{ 
-            width: '100%', 
-            height: '100%',
-          }} 
-        />
+        <div className='w-[432px] h-[288px] bg-red-500'>
+          <img 
+            src={item.cover  ? item.cover+'?imageMogr2/format/webp/thumbnail/x288' :  ''} 
+            alt={item.title} 
+            style={{ 
+              width: '100%', 
+              height: '100%',
+            }} 
+          />
+        </div>
       </div>
     }
   >
