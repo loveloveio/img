@@ -49,11 +49,11 @@ export default function Page() {
 
   const handleScroll = useCallback(() => {
     if (loading || !hasMore) return;
-    
+
     const scrollHeight = document.documentElement.scrollHeight;
     const scrollTop = document.documentElement.scrollTop;
     const clientHeight = document.documentElement.clientHeight;
-    
+
     if (scrollHeight - scrollTop - clientHeight < 100) {
       fetchPhotoCollections(page + 1);
     }
@@ -116,6 +116,11 @@ export default function Page() {
         {loading && (
           <div className="flex justify-center mt-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          </div>
+        )}
+        {!loading && photoCollections.length === 0 && (
+          <div className="text-center text-gray-500 mt-8">
+            已经到底啦 ~
           </div>
         )}
       </div>
