@@ -121,9 +121,11 @@ export default function Mobile() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 p-4">
-                {photoCollections.map((album, index) => (
-                    <PhotoCollectionCard key={index} item={album} />
+            <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4 px-2">
+                {photoCollections.map((album) => (
+                    <div key={album.id} className="mb-4 break-inside-avoid">
+                        <PhotoCollectionCard item={album} />
+                    </div>
                 ))}
             </div>
             {loading && (

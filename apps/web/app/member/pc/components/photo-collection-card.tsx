@@ -1,15 +1,14 @@
-import { Col, Card } from 'antd';
+import { Card } from 'antd';
 import { PhotoCollection } from '@prisma/client';
 import { useRouter } from 'next/navigation';
-import {UAParser} from 'ua-parser-js'
+import { UAParser } from 'ua-parser-js'
 export interface PhotoCollectionCardProps {
   item: PhotoCollection;
 }
 
 export const PhotoCollectionCard = ({ item }: PhotoCollectionCardProps) => {
   const router = useRouter();
-  return <Col xs={24} sm={12} md={8} lg={6} key={item.uuid}>
-  <Card
+  return <Card
     onClick={() => {
       const parser = new UAParser(window.navigator.userAgent);
       if (parser.getDevice().is('mobile')) {
@@ -20,17 +19,12 @@ export const PhotoCollectionCard = ({ item }: PhotoCollectionCardProps) => {
     }}
     hoverable
     cover={
-      <div style={{ background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className='w-[432px] h-[288px] bg-red-500'>
-          <img 
-            src={item.cover  ? item.cover+'?imageMogr2/format/webp/thumbnail/x288' :  ''} 
-            alt={item.title} 
-            style={{ 
-              width: '100%', 
-              height: '100%',
-            }} 
-          />
-        </div>
+      <div className='w-full bg-gray-100 flex items-center justify-center'>
+        <img
+          src={item.cover ? item.cover + '?imageMogr2/format/webp/thumbnail/432x' : ''}
+          alt={item.title}
+          className="w-full"
+        />
       </div>
     }
   >
@@ -44,5 +38,4 @@ export const PhotoCollectionCard = ({ item }: PhotoCollectionCardProps) => {
       }
     />
   </Card>
-</Col>;
 };
