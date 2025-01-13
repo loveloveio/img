@@ -31,6 +31,10 @@ export const prisma = globalForPrisma.prisma || new PrismaClient({
                 status: result.status,
                 createdAt: result.createdAt,
                 updatedAt: result.updatedAt,
+                _geo: {
+                    lat: Math.random() * 180 - 90,
+                    lng: Math.random() * 360 - 180
+                },
             }])
             return result
         },

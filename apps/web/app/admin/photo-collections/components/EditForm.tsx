@@ -240,7 +240,7 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
         tags: initialValues?.tags ?? [],
         sort: initialValues?.sort ?? 10,
         status: initialValues?.status ?? PaymentMethodStatus.ENABLED,
-        recommend: initialValues?.recommend ?? false,
+        recommend: initialValues?.recommend ?? true,
       }}
       onFinish={handleSubmit}
       modalProps={{

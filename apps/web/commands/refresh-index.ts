@@ -22,6 +22,10 @@ import { getPhotoCollectionIndex } from "@/libs/meilisearch";
                 description: photoCollection.description ?? '',
                 createdAt: photoCollection.createdAt,
                 updatedAt: photoCollection.updatedAt,
+                _geo: {
+                    lat: Math.random() * 180 - 90,
+                    lng: Math.random() * 360 - 180
+                },
             });
     }
     const resq = await index?.addDocuments(documents);

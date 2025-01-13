@@ -20,14 +20,14 @@ export const getPhotoCollectionIndex = async () => {
                 primaryKey: 'id'
             })
             photoCollectionIndex = client.index('photo-collections')
-            await photoCollectionIndex.updateDisplayedAttributes(['id', 'imageCount', 'uuid', 'cover', 'title', 'subtitle', 'tags', 'recommend','status', 'description','updatedAt'])
+            await photoCollectionIndex.updateDisplayedAttributes(['id', 'imageCount', 'uuid', 'cover', 'title', 'subtitle', 'tags', 'recommend','status', 'description','updatedAt','_geo'])
             await photoCollectionIndex.updateFilterableAttributes(['id', 'imageCount', 'uuid', 'cover', 'title', 'subtitle', 'tags', 'recommend', 'status', 'description','updatedAt'])
-            await photoCollectionIndex.updateSortableAttributes(['createdAt','updatedAt'])
+            await photoCollectionIndex.updateSortableAttributes(['createdAt','updatedAt','_geo'])
         } else {
             photoCollectionIndex = client.index('photo-collections')
-            await photoCollectionIndex.updateDisplayedAttributes(['id', 'imageCount', 'uuid', 'cover', 'title', 'subtitle', 'tags', 'recommend', 'status', 'description',   'updatedAt'])
+            await photoCollectionIndex.updateDisplayedAttributes(['id', 'imageCount', 'uuid', 'cover', 'title', 'subtitle', 'tags', 'recommend', 'status', 'description', 'updatedAt', '_geo'])
             await photoCollectionIndex.updateFilterableAttributes(['id', 'imageCount', 'uuid', 'cover', 'title', 'subtitle', 'tags', 'recommend', 'status', 'description', 'updatedAt'])
-            await photoCollectionIndex.updateSortableAttributes(['createdAt', 'updatedAt'])
+            await photoCollectionIndex.updateSortableAttributes(['createdAt', 'updatedAt', '_geo'])
         }
         return photoCollectionIndex;
     } catch (error) {

@@ -1,25 +1,57 @@
 'use client';
-import { Input, Row } from "antd";
+import { Input, Button } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PhotoCollection, Tag } from "@prisma/client";
 import { PhotoCollectionCard } from "./components/photo-collection-card";
+import axios from "axios";
+
 export default function Page() {
   const router = useRouter();
   const [photoCollections, setPhotoCollections] = useState<PhotoCollection[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [geo, ] = useState({
+    lat: Math.random() * 180 - 90,
+    lng: Math.random() * 360 - 180
+  });
+
+  const fetchPhotoCollections = async (currentPage: number) => {
+    setLoading(true);
+    try {
+      const res = await axios.get('/api/member/photo-collections', {
+        params: {
+          page: currentPage,
+          pageSize: 10,
+          recommend: true,
+          random: true,
+          lat: geo.lat,
+          lng: geo.lng
+        }
+      });
+      const data = res.data;
+      if (currentPage === 1) {
+        setPhotoCollections(data.data.photoCollections);
+      } else {
+        setPhotoCollections(prev => [...prev, ...data.data.photoCollections]);
+      }
+      setHasMore(data.data.photoCollections.length > 0);
+      setPage(currentPage);
+    } catch (error) {
+      console.error('Failed to fetch photo collections:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchPhotoCollections = async () => {
-      const res = await fetch('/api/member/photo-collections?recommend=true');
-      const data = await res.json();
-      console.log('data', data);
-      setPhotoCollections(data.data.photoCollections);
-    };
-    fetchPhotoCollections();
+    fetchPhotoCollections(1);
     const fetchTags = async () => {
-      const res = await fetch('/api/member/tags');
-      const data = await res.json();
+      const res = await axios.get('/api/member/tags');
+      const data = res.data;
       setTags(data.data.tags.filter((tag: Tag) => tag.allowDevices.includes('DESKTOP')));
     };
     fetchTags();
@@ -60,6 +92,19 @@ export default function Page() {
             </div>
           ))}
         </div>
+        {hasMore && (
+          <div className="flex justify-center mt-8">
+            <Button 
+              loading={loading}
+              onClick={() => {
+                fetchPhotoCollections(page + 1);
+              }}
+              size="large"
+            >
+              加载更多
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

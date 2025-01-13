@@ -8,6 +8,9 @@ const searchParamsSchema = z.object({
     recommend: z.string().transform(val => val === 'true').optional(),
     page: z.string().optional().transform(val => val ? parseInt(val) : 1),
     pageSize: z.string().optional().transform(val => val ? parseInt(val) : 10),
+    random: z.string().transform(val => val === 'true').optional(),
+    lat: z.string().optional().transform(val => val ? parseFloat(val) : 0),
+    lng: z.string().optional().transform(val => val ? parseFloat(val) : 0),
 });
 
 export async function GET(req: NextRequest) {
@@ -26,7 +29,7 @@ export async function GET(req: NextRequest) {
             filter: filter,
             limit: params.pageSize,
             offset: (params.page - 1) * params.pageSize,
-            sort: ['createdAt:desc']
+            sort: params.random ? [`_geoPoint(${params.lat},${params.lng}):asc`] : ['createdAt:desc']
         });
         const photoCollections = ((result?.hits ?? []) as PhotoCollection[]).map(item => ({
             uuid: item.uuid,
@@ -40,7 +43,7 @@ export async function GET(req: NextRequest) {
             code: 200,
             message: "success",
             data: {
-                photoCollections: photoCollections,
+                photoCollections: photoCollections.sort(() => Math.random() - 0.5),
             }
         });
     } catch (error) {
