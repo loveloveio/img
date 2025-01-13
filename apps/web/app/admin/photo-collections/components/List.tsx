@@ -95,7 +95,7 @@ export const List = () => {
               uid: window.crypto.randomUUID(),
               name: record.cover ?? '',
               url: record.cover ?? '',
-              thumbUrl: record.cover ?? '',
+              thumbUrl: `${record.cover ?? ''}?imageMogr2/format/webp/crop/80`,
               status: 'done',
               isCover: true,
               isPaid: false,
@@ -105,7 +105,7 @@ export const List = () => {
                 uid: window.crypto.randomUUID(),
                 name: url,
                 url: url,
-                thumbUrl: url,
+                thumbUrl: `${url}?imageMogr2/format/webp/crop/80`,
                 status: 'done',
                 isCover: false,
                 isPaid: false,
@@ -116,12 +116,13 @@ export const List = () => {
                 uid: window.crypto.randomUUID(),
                 name: url,
                 url: url,
-                thumbUrl: url,
+                thumbUrl: `${url}?imageMogr2/format/webp/crop/80`,
                 status: 'done',
                 isCover: false,
                 isPaid: true,
               });
             });
+            console.log(imageFiles);
             setCurrentRecord({
               ...record,
               tags: record?.tags ?? [],

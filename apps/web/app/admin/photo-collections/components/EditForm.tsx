@@ -207,7 +207,7 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
           uid: window.crypto.randomUUID(),
           name: item.name,
           url: item.url,
-          thumbUrl: item.url,
+          thumbUrl: item.thumbUrl,
           isCover: item.isCover,
           isPaid: item.isPaid,
           status: 'done',
@@ -334,11 +334,13 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
                 onPreview: (file) => {
                   handlePreview(file as PhotoCollectionImage);
                 },
-                beforeUpload: (file) => {
+                beforeUpload: async (file) => {
+                  // 将文件转为base64
+                  const base64 = await getBase64(file as FileType);
                   const t: PhotoCollectionImage = {
                     uid: file.uid,
                     name: file.name,
-                    thumbUrl: '',
+                    thumbUrl: base64,
                     status: 'uploading',
                     originFileObj: file,
                     isCover: false,
@@ -359,7 +361,7 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
                         const cover = pre.find((item) => item.isCover);
                         const isCover = !cover;
                         const isPaid = !isCover;
-                        return pre.map((item) => item.uid === file.uid ? { ...item, status: 'done', url: response.data.url, thumbUrl: response.data.url, isCover, isPaid } : item)
+                        return pre.map((item) => item.uid === file.uid ? { ...item, status: 'done', url: response.data.url, thumbUrl:  `${response.data.url}?imageMogr2/format/webp/crop/80`, isCover, isPaid } : item)
                       });
                     } else {
 
@@ -377,6 +379,7 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
                   setImageFiles((pre) => pre.filter((item) => item.uid !== file.uid));
                 },
                 itemRender: (originNode, file) => {
+                  console.log(file);
                   const f = imageFiles.find((item) => item.uid === file.uid);
                   if (!f) return null;
                   return <DraggableUploadListItem originNode={<div className='w-[102px] h-[102px] relative'>
@@ -402,7 +405,7 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
                   paidImages
                 }
               }}
-              rules={[{ required: true, message: '请上传预览图片' }]}
+              rules={[{ required: true, message: '请上传图片' }]}
             />
           </SortableContext>
         </DndContext>

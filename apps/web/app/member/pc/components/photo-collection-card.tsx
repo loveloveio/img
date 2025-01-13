@@ -22,7 +22,7 @@ export const PhotoCollectionCard = ({ item }: PhotoCollectionCardProps) => {
     cover={
       <div style={{ background: '#f5f5f5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <img 
-          src={item.cover ?? ''} 
+          src={item.cover  ? item.cover+'?imageMogr2/format/webp/thumbnail/432x288/pad/1/color/IzNEM0QzRA' :  ''} 
           alt={item.title} 
           style={{ 
             width: '100%', 

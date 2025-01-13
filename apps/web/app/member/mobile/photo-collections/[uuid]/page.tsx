@@ -29,7 +29,10 @@ export default function PhotoCollectionDetailPage() {
             const data = response.data;
             if (data.code === 200) {
                 setPhotoCollection(data.data.photoCollection);
-                setImages([...data.data.photoCollection.previewImages, ...data.data.photoCollection.paidImages].map((image) => ({ src: image })));
+                const tmpImages = [...data.data.photoCollection.previewImages, ...data.data.photoCollection.paidImages].map((image) => {
+                    return { src: `${image}?imageMogr2/format/webp` }
+                });
+                setImages(tmpImages);
             }
         } catch (error) {
             console.error('Error fetching photo collection:', error);

@@ -35,7 +35,10 @@ export default function PhotoCollectionDetailPage() {
             const data = response.data;
             if (data.code === 200) {
                 setPhotoCollection(data.data.photoCollection);
-                setImages([...data.data.photoCollection.previewImages, ...data.data.photoCollection.paidImages].map((image) => ({ src: image })));
+                const tmpImages = [...data.data.photoCollection.previewImages, ...data.data.photoCollection.paidImages].map((image) => {
+                    return { src: `${image}?imageMogr2/format/webp` }
+                });
+                setImages(tmpImages);
                 setIsFavorite(data.data.photoCollection.isFavorite);
             }
         } catch (error) {
