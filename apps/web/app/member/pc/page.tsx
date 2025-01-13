@@ -1,7 +1,7 @@
 'use client';
-import { Input, Button } from "antd";
+import { Input } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { PhotoCollection, Tag } from "@prisma/client";
 import { PhotoCollectionCard } from "./components/photo-collection-card";
@@ -14,7 +14,7 @@ export default function Page() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [geo, ] = useState({
+  const [geo,] = useState({
     lat: Math.random() * 180 - 90,
     lng: Math.random() * 360 - 180
   });
@@ -25,7 +25,7 @@ export default function Page() {
       const res = await axios.get('/api/member/photo-collections', {
         params: {
           page: currentPage,
-          pageSize: 10,
+          pageSize: 8,
           recommend: true,
           random: true,
           lat: geo.lat,
@@ -47,6 +47,23 @@ export default function Page() {
     }
   };
 
+  const handleScroll = useCallback(() => {
+    if (loading || !hasMore) return;
+    
+    const scrollHeight = document.documentElement.scrollHeight;
+    const scrollTop = document.documentElement.scrollTop;
+    const clientHeight = document.documentElement.clientHeight;
+    
+    if (scrollHeight - scrollTop - clientHeight < 100) {
+      fetchPhotoCollections(page + 1);
+    }
+  }, [loading, hasMore, page]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
   useEffect(() => {
     fetchPhotoCollections(1);
     const fetchTags = async () => {
@@ -56,6 +73,7 @@ export default function Page() {
     };
     fetchTags();
   }, []);
+
   return (
     <div className="w-full">
       <div className="flex flex-col items-center my-16">
@@ -87,22 +105,17 @@ export default function Page() {
         <h1 className="text-2xl font-bold my-8">推荐图集</h1>
         <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4 px-2">
           {photoCollections.map((album) => (
-            <div key={album.id} className="mb-4 break-inside-avoid">
+            <div
+              key={album.id}
+              className="mb-4 break-inside-avoid"
+            >
               <PhotoCollectionCard item={album} />
             </div>
           ))}
         </div>
-        {hasMore && (
+        {loading && (
           <div className="flex justify-center mt-8">
-            <Button 
-              loading={loading}
-              onClick={() => {
-                fetchPhotoCollections(page + 1);
-              }}
-              size="large"
-            >
-              加载更多
-            </Button>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
           </div>
         )}
       </div>
