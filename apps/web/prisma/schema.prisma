@@ -196,9 +196,6 @@ model User {
   giftCards                GiftCard[]
   browserHistories         BrowserHistory[]
   photoCollectionFavorites PhotoCollectionFavorite[]
-  folders                  Folder[]
-  disks                    Disk[]
-  files                    File[]
   @@unique([email])
   @@unique([username])
   @@map("user")
