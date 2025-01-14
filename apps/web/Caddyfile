@@ -8,3 +8,15 @@ dgdgddddff.com, www.dgdgddddff.com {
     encode zstd gzip
     reverse_proxy http://localhost:3000
 }
+
+
+http://sss.splive.top {
+    redir https://{host}{uri} permanent
+}
+sss.splive.top {
+    tls {
+        protocols tls1.2 tls1.3
+    }
+    encode zstd gzip
+    reverse_proxy http://localhost:3001
+}
