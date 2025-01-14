@@ -1,66 +1,33 @@
 'use client';
 
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, Popconfirm, Tag as AntdTag } from 'antd';
+import { Button, Popconfirm } from 'antd';
 import { useRef, useState } from 'react';
 import EditForm from './EditForm';
 import axios from 'axios';
 
-import { Site } from '@prisma/client';
+import { SearchEngine } from '@prisma/client';
 
 export const List = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState<Record<string, any> | null>(null);
 
-  const columns: ProColumns<Site>[] = [
+  const columns: ProColumns<SearchEngine>[] = [
+    {
+      title: '图标',
+      dataIndex: 'icon',
+      fixed: 'left',
+      width: 100,
+      search: false,
+      render: (text) => <img src={text as string} alt="icon" style={{ width: 20, height: 20 }} />
+    },
     {
       title: '名称',
       dataIndex: 'name',
-      fixed: 'left',
       width: 200,
       fieldProps: {
         placeholder: '请输入名称'
       }
-    },
-    {
-      title: 'URL',
-      dataIndex: 'url',
-      width: 300,
-      search: false,
-      ellipsis: true
-    },
-    {
-      title: '图标',
-      dataIndex: 'icon',
-      width: 100,
-      search: false,
-      render: (_, record) => record.icon && <img src={record.icon} alt={record.name} style={{ width: 20, height: 20 }} />
-    },
-    {
-      title: '描述',
-      dataIndex: 'description',
-      width: 200,
-      search: false,
-      ellipsis: true
-    },
-    {
-      title: '标签',
-      dataIndex: 'tags',
-      width: 200,
-      search: false,
-      render: (_, record) => (
-        <>
-          {record.tags.map(tag => (
-            <AntdTag key={tag}>{tag}</AntdTag>
-          ))}
-        </>
-      )
-    },
-    {
-      title: '点击数',
-      dataIndex: 'clickCount',
-      width: 100,
-      search: false
     },
     {
       title: '状态',
@@ -68,14 +35,9 @@ export const List = () => {
       width: 100,
       valueEnum: {
         ENABLED: { text: '启用', status: 'Success' },
-        DISABLED: { text: '禁用', status: 'Error' }
-      }
-    },
-    {
-      title: '排序',
-      dataIndex: 'sort',
-      width: 100,
-      search: false
+        DISABLED: { text: '禁用', status: 'Error' },
+      },
+      valueType: 'select',
     },
     {
       title: '创建时间',
@@ -86,7 +48,7 @@ export const List = () => {
     },
     {
       title: '更新时间',
-      dataIndex: 'updatedAt',
+      dataIndex: 'updatedAt', 
       valueType: 'dateTime',
       width: 200,
       search: false
@@ -97,20 +59,18 @@ export const List = () => {
       fixed: 'right',
       width: 150,
       search: false,
-      render: (text: React.ReactNode, record: Site) => [
+      render: (_: React.ReactNode, record: SearchEngine) => [
         <Button
           key="edit"
           type="link"
           onClick={() => {
             setCurrentRecord({
               ...record,
-              icon: [
-                {
-                  url: record.icon,
-                  name: record.name,
-                  uid: record.icon
-                }
-              ]
+              icon: [{
+                url: record.icon,
+                name: 'icon',
+                uid: record.icon
+              }]
             });
             setEditModalVisible(true);
           }}
@@ -122,7 +82,7 @@ export const List = () => {
           title="确定要删除吗？"
           onConfirm={async () => {
             try {
-              await axios.delete(`/api/admin/sites/${record.id}`);
+              await axios.delete(`/api/admin/search-engines/${record.id}`);
               actionRef.current?.reload();
             } catch (error) {
               console.error('Delete failed:', error);
@@ -134,31 +94,29 @@ export const List = () => {
       ],
     },
   ];
-
   const actionRef = useRef<ActionType>();
-
   return (
     <>
-      <ProTable<Site>
+      <ProTable<SearchEngine>
         actionRef={actionRef}
         columns={columns}
         scroll={{ x: 1500 }}
         request={async (params) => {
           try {
-            const { data: result } = await axios.get('/api/admin/sites', {
+            const { data: result } = await axios.get('/api/admin/search-engines', {
               params: {
                 page: params.current || 1,
                 limit: params.pageSize || 10,
-                name: params.name,
+                q: params.name,
                 status: params.status
               }
             });
             
             if (result.code === 200) {
               return {
-                data: result.data.list,
+                data: result.data.searchEngines,
                 success: true,
-                total: result.data.total,
+                total: result.data.pagination.total,
               };
             }
             return {
@@ -190,13 +148,13 @@ export const List = () => {
               setEditModalVisible(true);
             }}
           >
-            新增站点
+            新增搜索引擎
           </Button>,
         ]}
       />
 
       <EditForm
-        title={currentRecord ? '编辑站点' : '新增站点'}
+        title={currentRecord ? '编辑搜索引擎' : '新增搜索引擎'}
         open={editModalVisible}
         onOpenChange={setEditModalVisible}
         initialValues={currentRecord}

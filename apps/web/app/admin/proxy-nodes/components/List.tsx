@@ -35,10 +35,22 @@ export const List = () => {
       search: false
     },
     {
+      title: '免费',
+      dataIndex: 'free',
+      width: 100,
+      render: (_, record) => {
+        return record.free ? '是' : '否';
+      },
+      valueType: 'select',
+      valueEnum: {
+        true: { text: '是', status: 'Success' },
+        false: { text: '否', status: 'Error' },
+      },
+    },
+    {
       title: '状态',
       dataIndex: 'status',
       width: 100,
-      
       valueEnum: {
         ENABLED: { text: '启用', status: 'Success' },
         DISABLED: { text: '禁用', status: 'Error' },
@@ -109,7 +121,8 @@ export const List = () => {
                 page: params.current || 1,
                 limit: params.pageSize || 10,
                 title: params.title,
-                status: params.status
+                status: params.status,
+                free: params.free
               }
             });
             

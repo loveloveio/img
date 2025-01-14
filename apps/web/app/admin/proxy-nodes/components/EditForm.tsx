@@ -1,6 +1,6 @@
 'use client';
 
-import { ModalForm, ProFormText, ProFormTextArea, ProFormSelect, ProFormInstance } from '@ant-design/pro-components';
+import { ModalForm, ProFormText, ProFormTextArea, ProFormSelect, ProFormInstance, ProFormSwitch, ProFormRadio, ProForm } from '@ant-design/pro-components';
 import { message } from 'antd';
 import axios from 'axios';
 import { useRef } from 'react';
@@ -53,7 +53,8 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
       }}
       initialValues={{
         ...initialValues,
-        status: initialValues?.status || 'ENABLED'
+        status: initialValues?.status || 'ENABLED',
+        free: initialValues?.free || false
       }}
       onFinish={handleSubmit}
       modalProps={{
@@ -70,26 +71,21 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
         label="标题"
         rules={[{ required: true, message: '请输入标题' }]}
       />
+      <ProFormText
+        name="url"
+        label="URL"
+        rules={[{ required: true, message: '请输入URL' }]}
+      />
       <ProFormTextArea
         name="remark"
         label="备注"
         placeholder="请输入备注"
         fieldProps={{ rows: 3 }}
       />
-      <ProFormText
-        name="url"
-        label="URL"
-        rules={[{ required: true, message: '请输入URL' }]}
-      />
-      <ProFormSelect
-        name="status"
-        label="状态"
-        options={[
-          { label: '启用', value: 'ENABLED' },
-          { label: '禁用', value: 'DISABLED' }
-        ]}
-        rules={[{ required: true, message: '请选择状态' }]}
-      />
+      <ProForm.Group>
+        <ProFormSwitch name="free" label="免费" fieldProps={{checkedChildren: '免费',unCheckedChildren: '付费'}} rules={[{ required: true, message: '请选择是否免费' }]}/>
+        <ProFormSwitch name="status" label="状态" fieldProps={{checkedChildren: '启用',unCheckedChildren: '禁用'}} transform={(value) => value ? 'ENABLED' : 'DISABLED'} rules={[{ required: true, message: '请选择状态' }]}/>
+      </ProForm.Group>
     </ModalForm>
   );
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/libs/db";
+import { Prisma } from "@prisma/client";
 
 export async function GET(request: Request) {
 
@@ -7,7 +8,14 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get("page") || "1");
     const pageSize = parseInt(searchParams.get("pageSize") || "20");
     const keyword = searchParams.get("q") || "";
-
+    const where: Prisma.SiteWhereInput = {
+        deletedAt: null,
+    };
+    if (keyword) {
+        where.OR = [
+            { name: { contains: keyword } },
+        ];
+    }
     try {
         const sites = await prisma.site.findMany({
             select: {
@@ -17,13 +25,7 @@ export async function GET(request: Request) {
                 icon: true,
                 sort: true
             },
-            where: {
-                deletedAt: null,
-                OR: [
-                    { name: { contains: keyword } },
-                    { description: { contains: keyword } }
-                ]
-            },
+            where,
             orderBy: {
                 sort: 'asc'
             },
@@ -40,15 +42,17 @@ export async function GET(request: Request) {
                 ]
             }
         });
-
         return NextResponse.json({
-            code: 0,
+            code: 200,
             message: "success",
             data: {
                 sites: sites.map((site) => ({
                     ...site,
                     id: Number(site.id)
-                }))
+                })),
+                total,
+                page,
+                pageSize
             }
         });
     } catch (error) {

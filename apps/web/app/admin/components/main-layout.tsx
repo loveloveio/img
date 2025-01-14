@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { ProLayout } from '@ant-design/pro-components'
-import { LogoutOutlined, DashboardOutlined, ShoppingOutlined, PictureOutlined, PayCircleOutlined, TagsOutlined, ApiOutlined, CloudServerOutlined, GiftOutlined, GiftTwoTone, CreditCardOutlined, CrownOutlined, GlobalOutlined, UserOutlined } from '@ant-design/icons'
+import { LogoutOutlined, DashboardOutlined, ShoppingOutlined, PictureOutlined, PayCircleOutlined, TagsOutlined, ApiOutlined, CloudServerOutlined, GiftOutlined, GiftTwoTone, CreditCardOutlined, CrownOutlined, GlobalOutlined, UserOutlined, SearchOutlined } from '@ant-design/icons'
 import { authClient } from '@/libs/better-client';
 import { Button, Modal, Breadcrumb } from 'antd'
 import { usePathname, useRouter } from 'next/navigation'
@@ -35,60 +35,65 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       name: '控制台',
       icon: <DashboardOutlined />,
     },
-    {
-      path: '/admin/orders',
-      name: '订单管理',
-      icon: <ShoppingOutlined />,
-    },
-    {
-      path: '/admin/photo-collections',
-      name: '图集管理',
-      icon: <PictureOutlined />,
-    },
-    {
-      path: '/admin/payment-methods',
-      name: '支付方法管理',
-      icon: <PayCircleOutlined />,
-    },
-    {
-      path: '/admin/tags',
-      name: '标签管理',
-      icon: <TagsOutlined />,
-    },
     // {
-    //   path: '/admin/service-endpoints',
-    //   name: '服务端点管理',
-    //   icon: <ApiOutlined />,
+    //   path: '/admin/orders',
+    //   name: '订单管理',
+    //   icon: <ShoppingOutlined />,
     // },
     // {
-    //   path: '/admin/proxy-nodes',
-    //   name: '代理节点管理',
-    //   icon: <CloudServerOutlined />,
+    //   path: '/admin/photo-collections',
+    //   name: '图集管理',
+    //   icon: <PictureOutlined />,
     // },
     // {
-    //   path: '/admin/gift-card-packages',
-    //   name: '礼品卡套餐管理',
-    //   icon: <GiftOutlined />,
+    //   path: '/admin/payment-methods',
+    //   name: '支付方法管理',
+    //   icon: <PayCircleOutlined />,
     // },
     // {
-    //   path: '/admin/gift-cards',
-    //   name: '礼品卡管理',
-    //   icon: <CreditCardOutlined />,
+    //   path: '/admin/tags',
+    //   name: '标签管理',
+    //   icon: <TagsOutlined />,
     // },
+    {
+      path: '/admin/service-endpoints',
+      name: '服务端点管理',
+      icon: <ApiOutlined />,
+    },
+    {
+      path: '/admin/proxy-nodes',
+      name: '代理节点管理',
+      icon: <CloudServerOutlined />,
+    },
+    {
+      path: '/admin/gift-card-packages',
+      name: '礼品卡套餐管理',
+      icon: <GiftOutlined />,
+    },
+    {
+      path: '/admin/gift-cards',
+      name: '礼品卡管理',
+      icon: <CreditCardOutlined />,
+    },
     // {
     //   path: '/admin/vip-packages',
     //   name: 'VIP套餐管理',
     //   icon: <CrownOutlined />,
     // },
-    // {
-    //   path: '/admin/sites',
-    //   name: '站点管理',
-    //   icon: <GlobalOutlined />,
-    // },
+    {
+      path: '/admin/sites',
+      name: '站点管理',
+      icon: <GlobalOutlined />,
+    },
     {
       path: '/admin/users',
       name: '用户管理',
       icon: <UserOutlined />,
+    },
+    {
+      path: '/admin/search-engines',
+      name: '搜索引擎管理',
+      icon: <SearchOutlined />,
     },
   ]
 

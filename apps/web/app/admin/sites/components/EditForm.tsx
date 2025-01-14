@@ -1,9 +1,10 @@
 'use client';
 
-import { ModalForm, ProFormText, ProFormDigit, ProFormTextArea, ProFormSelect, ProForm, ProFormInstance } from '@ant-design/pro-components';
+import { ModalForm, ProFormText, ProFormDigit, ProFormTextArea, ProFormSelect, ProForm, ProFormInstance, ProFormUploadButton } from '@ant-design/pro-components';
 import { message } from 'antd';
 import axios from 'axios';
 import { useRef } from 'react';
+import ImgCrop from 'antd-img-crop';
 type Props = {
   initialValues?: any;
   onSuccess: () => void;
@@ -79,9 +80,19 @@ export default function EditForm({ initialValues, onSuccess, open, onOpenChange,
           { type: 'url', message: '请输入有效的URL' }
         ]}
       />
-      <ProFormText
+      <ProFormUploadButton
         name="icon"
         label="图标"
+        max={1}
+        action="/api/admin/upload"
+        fieldProps={{
+          accept: '.png,.jpg,.jpeg,.svg',
+          listType: 'picture-card'
+        }}
+        transform={(value) => {
+          return value[0]?.response?.url || value[0]?.url
+        }}
+        rules={[{ required: true, message: '请上传图标' }]}
       />
       <ProFormTextArea
         name="description"

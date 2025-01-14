@@ -7,6 +7,7 @@ const updateSchema = z.object({
   remark: z.string().optional(),
   url: z.string().min(1, 'URL不能为空').optional(),
   status: z.enum(['ENABLED', 'DISABLED']).optional(),
+  free: z.boolean().optional(),
 });
 
 export async function GET(

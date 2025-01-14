@@ -7,6 +7,7 @@ const querySchema = z.object({
   limit: z.string().transform(Number).default('10'),
   title: z.string().optional(),
   status: z.string().optional(),
+  free: z.string().transform((t) => t === 'true').optional(),
 });
 
 const createSchema = z.object({
@@ -14,12 +15,13 @@ const createSchema = z.object({
   remark: z.string().optional(),
   url: z.string().min(1, 'URL不能为空'),
   status: z.enum(['ENABLED', 'DISABLED']).default('ENABLED'),
+  free: z.string().transform(Boolean),
 });
 
 export async function GET(req: NextRequest) {
   try {
     const searchParams = Object.fromEntries(req.nextUrl.searchParams);
-    const { page, limit, title, status } = await querySchema.parseAsync(searchParams);
+    const { page, limit, title, status, free } = await querySchema.parseAsync(searchParams);
     const where: any = {};
     
     if (title) {
@@ -29,6 +31,10 @@ export async function GET(req: NextRequest) {
     }
     if (status) {
       where.status = status;
+    }
+
+    if (free !== undefined) {
+      where.free = free;
     }
 
     const total = await prisma.proxyNode.count({ where });
@@ -76,14 +82,15 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { title, remark, url, status } = await createSchema.parseAsync(body);
+    const { title, remark, url, status, free } = await createSchema.parseAsync(body);
 
     const node = await prisma.proxyNode.create({
       data: {
         title,
         remark,
         url,
-        status
+        status,
+        free
       }
     });
 
