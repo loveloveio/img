@@ -3625,6 +3625,11 @@
     "@react-types/overlays" "^3.8.11"
     "@react-types/shared" "^3.26.0"
 
+"@remixicon/react@^4.6.0":
+  version "4.6.0"
+  resolved "https://registry.npmmirror.com/@remixicon/react/-/react-4.6.0.tgz#c25276338b4d7acd29075c5b26a20f19feecac04"
+  integrity sha512-bY56maEgT5IYUSRotqy9h03IAKJC85vlKtWFg2FKzfs8JPrkdBAYSa9dxoUSKFwGzup8Ux6vjShs9Aec3jvr2w==
+
 "@simplewebauthn/browser@^13.0.0":
   version "13.0.0"
   resolved "https://registry.npmmirror.com/@simplewebauthn/browser/-/browser-13.0.0.tgz#f62acd60dbc196af07fa2a118ab2f5567ab4662e"
@@ -4552,6 +4557,14 @@ ansi-styles@^6.1.0:
   version "6.2.1"
   resolved "https://registry.npmmirror.com/ansi-styles/-/ansi-styles-6.2.1.tgz#0e62320cf99c21afff3b3012192546aacbfb05c5"
   integrity sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==
+
+antd-img-crop@^4.24.0:
+  version "4.24.0"
+  resolved "https://registry.npmmirror.com/antd-img-crop/-/antd-img-crop-4.24.0.tgz#7b7a2c8d14482cbd9d37bfc685c10eadf901078c"
+  integrity sha512-RqY/XqvmUnHlj7oLV2kN/ytdZdHUFAZyM3TN+QlTlLrze1Q74isAePgG+QTkLAbrkR9L/IgVRpjsuH/nevpU7Q==
+  dependencies:
+    react-easy-crop "^5.2.0"
+    tslib "^2.8.1"
 
 antd@^5.22.7:
   version "5.22.7"
@@ -6955,6 +6968,11 @@ normalize-range@^0.1.2:
   resolved "https://registry.npmmirror.com/normalize-range/-/normalize-range-0.1.2.tgz#2d10c06bdfd312ea9777695a4d28439456b75942"
   integrity sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==
 
+normalize-wheel@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.npmmirror.com/normalize-wheel/-/normalize-wheel-1.0.1.tgz#aec886affdb045070d856447df62ecf86146ec45"
+  integrity sha512-1OnlAPZ3zgrk8B91HyRj+eVv+kS5u+Z0SCsak6Xil/kmgEia50ga7zfkumayonZrImffAxPU/5WcyGhzetHNPA==
+
 npm-run-path@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/npm-run-path/-/npm-run-path-4.0.1.tgz#b7ecd1e5ed53da8e37a55e1c2269e0b97ed748ea"
@@ -7922,6 +7940,14 @@ react-dom@^19.0.0:
   integrity sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==
   dependencies:
     scheduler "^0.25.0"
+
+react-easy-crop@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.npmmirror.com/react-easy-crop/-/react-easy-crop-5.2.0.tgz#7b59525c558f568e8796a84c91d1e609e9775ee0"
+  integrity sha512-gjb7jN+WnwfgpbNUI2jSwyoIxF1sJ0PVSNVgEysAgF1rj8AqR75fqmdvqZ6PFVgEX3rT1G4HJELesiQXr2ZvAg==
+  dependencies:
+    normalize-wheel "^1.0.1"
+    tslib "^2.0.1"
 
 react-hook-form@^7.54.2:
   version "7.54.2"
