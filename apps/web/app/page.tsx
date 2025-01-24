@@ -9,7 +9,7 @@ export default function Home() {
       </div>
       <img src="/app-icon.webp" alt="App Icon" className="rounded-3xl shadow-lg mb-8 w-[200px] h-[200px]" />
       <a 
-        href="/download" 
+        href="/app.apk" 
         className="bg-blue-500 text-white px-6 py-3 rounded-full text-xl font-medium hover:bg-blue-600 transition duration-300"
       >
         立即下载
