@@ -26,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Script defer src="https://cloud.umami.is/script.js" data-website-id="af22bceb-33a5-450b-af0f-f138987b736a"></Script>
+      {/* <Script defer src="https://cloud.umami.is/script.js" data-website-id="af22bceb-33a5-450b-af0f-f138987b736a"></Script> */}
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
       {children}
       </body>
