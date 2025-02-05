@@ -14,6 +14,12 @@ export default function Home() {
       >
         立即下载
       </a>
+      <a 
+        href="/app-v7a.apk" 
+        className="bg-blue-500 text-white px-6 py-3 rounded-full text-xl font-medium hover:bg-blue-600 transition duration-300 mt-4"
+      >
+        32位版本下载
+      </a>
     </div>
   );
 }
